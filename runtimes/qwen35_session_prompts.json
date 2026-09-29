@@ -1,0 +1,216 @@
+{
+  "source": {
+    "prompts": "AndroidWorld/android_world/agents/PROMPT.py",
+    "runtimes": "AndroidWorld/android_world/agents/session_runtimes.py",
+    "doc": "qwen35_session.md"
+  },
+  "shared_runtime_notes": {
+    "cli": "--runtime qwen35_session | qwen3vl_session",
+    "last_n": "Keep images only in the last N image-bearing messages; older screenshots become text placeholder 'This screenshot has been collapsed.' (message slot retained).",
+    "observation_role": "tool (Qwen backend); Gemini uses user+image only",
+    "enable_thinking": "Qwen session: chat_template_kwargs.enable_thinking",
+    "agent_classes": {
+      "qwen35_session": "Qwen35Session",
+      "qwen3vl_session": "Qwen3VLSession"
+    }
+  },
+  "dialects": {
+    "qwen35_xml": {
+      "runtime": "qwen35_session",
+      "runtime_spec": {
+        "name": "qwen35_session",
+        "agent_name": "qwen35_session",
+        "description": "Qwen3.5 multi-turn session (qwen35_session.md): <think> + XML tool_call; query once; screenshots as tool messages."
+      },
+      "tool_call_format": "xml",
+      "tool_call_example": "<tool_call>\n<function=mobile_use>\n<parameter=action>\nclick\n</parameter>\n<parameter=coordinate>\n[163, 718]\n</parameter>\n</function>\n</tool_call>",
+      "assistant_turn_shape": "<think>...</think>\n<tool_call>...XML...</tool_call>",
+      "prompts": {
+        "system": "# Tools\n\nYou have access to the following functions:\n\n<tools>\n{\"type\": \"function\", \"function\": {\"name\": \"mobile_use\", \"description\": \"Use a touchscreen to interact with a mobile device and take screenshots.\\n* This is an interface to a mobile device with touchscreen. You can perform actions like clicking, typing, swiping, etc.\\n* Some applications may take time to start or process actions, so you may need to wait and take successive screenshots to see the results of your actions.\\n* The screen's resolution is 999x999.\\n* Make sure to click any buttons, links, icons, etc with the cursor tip in the center of the element. Don't click boxes on their edges unless asked.\", \"parameters\": {\"properties\": {\"action\": {\"description\": \"The action to perform. The available actions are:\\n* `click`: Click the point on the screen with coordinate (x, y).\\n* `long_press`: Press the point on the screen with coordinate (x, y) for specified seconds.\\n* `swipe`: Swipe from the starting point with coordinate (x, y) to the end point with coordinates2 (x2, y2).\\n* `type`: Input the specified text into the activated input box.\\n* `answer`: Output the answer.\\n* `system_button`: Press the system button.\\n* `wait`: Wait specified seconds for the change to happen.\\n* `terminate`: Terminate the current task and report its completion status.\", \"enum\": [\"click\", \"long_press\", \"swipe\", \"type\", \"answer\", \"system_button\", \"wait\", \"terminate\"], \"type\": \"string\"}, \"coordinate\": {\"description\": \"(x, y): The x and y coordinates. Required only by `action=click`, `action=long_press`, and `action=swipe`.\", \"type\": \"array\"}, \"coordinate2\": {\"description\": \"(x, y): The end coordinates. Required only by `action=swipe`.\", \"type\": \"array\"}, \"text\": {\"description\": \"Required only by `action=type` and `action=answer`.\", \"type\": \"string\"}, \"time\": {\"description\": \"The seconds to wait. Required only by `action=long_press` and `action=wait`.\", \"type\": \"number\"}, \"button\": {\"description\": \"Required only by `action=system_button`.\", \"enum\": [\"Back\", \"Home\", \"Menu\", \"Enter\"], \"type\": \"string\"}, \"status\": {\"description\": \"Required only by `action=terminate`.\", \"enum\": [\"success\", \"failure\"], \"type\": \"string\"}}, \"required\": [\"action\"], \"type\": \"object\"}}}\n</tools>\n\nEach response must include exactly one function call in the following XML format:\n\n<tool_call>\n<function=mobile_use>\n<parameter=action>\nclick\n</parameter>\n<parameter=coordinate>\n[163, 718]\n</parameter>\n</function>\n</tool_call>\n\n# Session interaction\n\n- The task query is provided only once in the first user message, together with the initial screenshot(s).\n- After each tool call, the environment returns a tool message containing the resulting screenshot(s).\n- All previous assistant responses remain available as the response history.\n- On each turn, inspect the currently provided screenshot(s) and the complete response history, then choose exactly one next action.\n- Do not invent tool messages or screenshot placeholders; they are inserted by the caller.\n- Continue until the task is complete or cannot be completed, then call terminate with the appropriate status.\n\n# Response format\n\nResponse format for every assistant turn:\n1) A <think>...</think> block containing the reasoning for the next move.\n2) A single <tool_call>...</tool_call> block in the Qwen3.5 XML function-call format.\n\nRules:\n- Output exactly in the order: <think>, <tool_call>.\n- Function calls MUST use <tool_call><function=...><parameter=...>...</parameter></function></tool_call>.\n- Put each argument in its own <parameter=...>...</parameter> block.\n- For array/object arguments, write valid JSON inside the parameter block.\n- Do not output anything after </tool_call>.\n- If finishing, use action=terminate in the tool call.\n\n# Visual context\n\n- Only the most recent screenshot(s) are kept as images (controlled by last_n).\n- Older screenshots are replaced with the text placeholder: This screenshot has been collapsed. (message slot retained; assistant text history is unchanged).\n- Always base the next action on the currently provided screenshots and the response history.\n- Do not assume access to screenshot pixels that are not currently provided.\n\n# Robustness rules\n\n- If the response history suggests you are stuck repeating similar actions without progress, try a different action.\n- Use the complete response history to avoid repeating actions that have already been performed.\n- Base each action on the currently available screenshots; never assume that an earlier action succeeded without checking its result.",
+        "system_lines": [
+          "# Tools",
+          "",
+          "You have access to the following functions:",
+          "",
+          "<tools>",
+          "{\"type\": \"function\", \"function\": {\"name\": \"mobile_use\", \"description\": \"Use a touchscreen to interact with a mobile device and take screenshots.\\n* This is an interface to a mobile device with touchscreen. You can perform actions like clicking, typing, swiping, etc.\\n* Some applications may take time to start or process actions, so you may need to wait and take successive screenshots to see the results of your actions.\\n* The screen's resolution is 999x999.\\n* Make sure to click any buttons, links, icons, etc with the cursor tip in the center of the element. Don't click boxes on their edges unless asked.\", \"parameters\": {\"properties\": {\"action\": {\"description\": \"The action to perform. The available actions are:\\n* `click`: Click the point on the screen with coordinate (x, y).\\n* `long_press`: Press the point on the screen with coordinate (x, y) for specified seconds.\\n* `swipe`: Swipe from the starting point with coordinate (x, y) to the end point with coordinates2 (x2, y2).\\n* `type`: Input the specified text into the activated input box.\\n* `answer`: Output the answer.\\n* `system_button`: Press the system button.\\n* `wait`: Wait specified seconds for the change to happen.\\n* `terminate`: Terminate the current task and report its completion status.\", \"enum\": [\"click\", \"long_press\", \"swipe\", \"type\", \"answer\", \"system_button\", \"wait\", \"terminate\"], \"type\": \"string\"}, \"coordinate\": {\"description\": \"(x, y): The x and y coordinates. Required only by `action=click`, `action=long_press`, and `action=swipe`.\", \"type\": \"array\"}, \"coordinate2\": {\"description\": \"(x, y): The end coordinates. Required only by `action=swipe`.\", \"type\": \"array\"}, \"text\": {\"description\": \"Required only by `action=type` and `action=answer`.\", \"type\": \"string\"}, \"time\": {\"description\": \"The seconds to wait. Required only by `action=long_press` and `action=wait`.\", \"type\": \"number\"}, \"button\": {\"description\": \"Required only by `action=system_button`.\", \"enum\": [\"Back\", \"Home\", \"Menu\", \"Enter\"], \"type\": \"string\"}, \"status\": {\"description\": \"Required only by `action=terminate`.\", \"enum\": [\"success\", \"failure\"], \"type\": \"string\"}}, \"required\": [\"action\"], \"type\": \"object\"}}}",
+          "</tools>",
+          "",
+          "Each response must include exactly one function call in the following XML format:",
+          "",
+          "<tool_call>",
+          "<function=mobile_use>",
+          "<parameter=action>",
+          "click",
+          "</parameter>",
+          "<parameter=coordinate>",
+          "[163, 718]",
+          "</parameter>",
+          "</function>",
+          "</tool_call>",
+          "",
+          "# Session interaction",
+          "",
+          "- The task query is provided only once in the first user message, together with the initial screenshot(s).",
+          "- After each tool call, the environment returns a tool message containing the resulting screenshot(s).",
+          "- All previous assistant responses remain available as the response history.",
+          "- On each turn, inspect the currently provided screenshot(s) and the complete response history, then choose exactly one next action.",
+          "- Do not invent tool messages or screenshot placeholders; they are inserted by the caller.",
+          "- Continue until the task is complete or cannot be completed, then call terminate with the appropriate status.",
+          "",
+          "# Response format",
+          "",
+          "Response format for every assistant turn:",
+          "1) A <think>...</think> block containing the reasoning for the next move.",
+          "2) A single <tool_call>...</tool_call> block in the Qwen3.5 XML function-call format.",
+          "",
+          "Rules:",
+          "- Output exactly in the order: <think>, <tool_call>.",
+          "- Function calls MUST use <tool_call><function=...><parameter=...>...</parameter></function></tool_call>.",
+          "- Put each argument in its own <parameter=...>...</parameter> block.",
+          "- For array/object arguments, write valid JSON inside the parameter block.",
+          "- Do not output anything after </tool_call>.",
+          "- If finishing, use action=terminate in the tool call.",
+          "",
+          "# Visual context",
+          "",
+          "- Only the most recent screenshot(s) are kept as images (controlled by last_n).",
+          "- Older screenshots are replaced with the text placeholder: This screenshot has been collapsed. (message slot retained; assistant text history is unchanged).",
+          "- Always base the next action on the currently provided screenshots and the response history.",
+          "- Do not assume access to screenshot pixels that are not currently provided.",
+          "",
+          "# Robustness rules",
+          "",
+          "- If the response history suggests you are stuck repeating similar actions without progress, try a different action.",
+          "- Use the complete response history to avoid repeating actions that have already been performed.",
+          "- Base each action on the currently available screenshots; never assume that an earlier action succeeded without checking its result."
+        ],
+        "user": "The user query: {instruction}\n"
+      },
+      "message_schema_example": {
+        "id": "task_name",
+        "runtime": "qwen35_session",
+        "messages": [
+          {
+            "role": "system",
+            "content": "# Tools\n\nYou have access to the following functions:\n\n<tools>\n{\"type\": \"function\", \"function\": {\"name\": \"mobile_use\", \"description\": \"Use a touchscreen to interact with a mobile device and take screenshots.\\n* This is an interface to a mobile device with touchscreen. You can perform actions like clicking, typing, swiping, etc.\\n* Some applications may take time to start or process actions, so you may need to wait and take successive screenshots to see the results of your actions.\\n* The screen's resolution is 999x999.\\n* Make sure to click any buttons, links, icons, etc with the cursor tip in the center of the element. Don't click boxes on their edges unless asked.\", \"parameters\": {\"properties\": {\"action\": {\"description\": \"The action to perform. The available actions are:\\n* `click`: Click the point on the screen with coordinate (x, y).\\n* `long_press`: Press the point on the screen with coordinate (x, y) for specified seconds.\\n* `swipe`: Swipe from the starting point with coordinate (x, y) to the end point with coordinates2 (x2, y2).\\n* `type`: Input the specified text into the activated input box.\\n* `answer`: Output the answer.\\n* `system_button`: Press the system button.\\n* `wait`: Wait specified seconds for the change to happen.\\n* `terminate`: Terminate the current task and report its completion status.\", \"enum\": [\"click\", \"long_press\", \"swipe\", \"type\", \"answer\", \"system_button\", \"wait\", \"terminate\"], \"type\": \"string\"}, \"coordinate\": {\"description\": \"(x, y): The x and y coordinates. Required only by `action=click`, `action=long_press`, and `action=swipe`.\", \"type\": \"array\"}, \"coordinate2\": {\"description\": \"(x, y): The end coordinates. Required only by `action=swipe`.\", \"type\": \"array\"}, \"text\": {\"description\": \"Required only by `action=type` and `action=answer`.\", \"type\": \"string\"}, \"time\": {\"description\": \"The seconds to wait. Required only by `action=long_press` and `action=wait`.\", \"type\": \"number\"}, \"button\": {\"description\": \"Required only by `action=system_button`.\", \"enum\": [\"Back\", \"Home\", \"Menu\", \"Enter\"], \"type\": \"string\"}, \"status\": {\"description\": \"Required only by `action=terminate`.\", \"enum\": [\"success\", \"failure\"], \"type\": \"string\"}}, \"required\": [\"action\"], \"type\": \"object\"}}}\n</tools>\n\nEach response must include exactly one function call in the following XML format:\n\n<tool_call>\n<function=mobile_use>\n<parameter=action>\nclick\n</parameter>\n<parameter=coordinate>\n[163, 718]\n</parameter>\n</function>\n</tool_call>\n\n# Session interaction\n\n- The task query is provided only once in the first user message, together with the initial screenshot(s).\n- After each tool call, the environment returns a tool message containing the resulting screenshot(s).\n- All previous assistant responses remain available as the response history.\n- On each turn, inspect the currently provided screenshot(s) and the complete response history, then choose exactly one next action.\n- Do not invent tool messages or screenshot placeholders; they are inserted by the caller.\n- Continue until the task is complete or cannot be completed, then call terminate with the appropriate status.\n\n# Response format\n\nResponse format for every assistant turn:\n1) A <think>...</think> block containing the reasoning for the next move.\n2) A single <tool_call>...</tool_call> block in the Qwen3.5 XML function-call format.\n\nRules:\n- Output exactly in the order: <think>, <tool_call>.\n- Function calls MUST use <tool_call><function=...><parameter=...>...</parameter></function></tool_call>.\n- Put each argument in its own <parameter=...>...</parameter> block.\n- For array/object arguments, write valid JSON inside the parameter block.\n- Do not output anything after </tool_call>.\n- If finishing, use action=terminate in the tool call.\n\n# Visual context\n\n- Only the most recent screenshot(s) are kept as images (controlled by last_n).\n- Older screenshots are replaced with the text placeholder: This screenshot has been collapsed. (message slot retained; assistant text history is unchanged).\n- Always base the next action on the currently provided screenshots and the response history.\n- Do not assume access to screenshot pixels that are not currently provided.\n\n# Robustness rules\n\n- If the response history suggests you are stuck repeating similar actions without progress, try a different action.\n- Use the complete response history to avoid repeating actions that have already been performed.\n- Base each action on the currently available screenshots; never assume that an earlier action succeeded without checking its result."
+          },
+          {
+            "role": "user",
+            "content": "The user query: {instruction}\n<image>"
+          },
+          {
+            "role": "assistant",
+            "content": "<think>...</think>\n<tool_call>\n<function=mobile_use>\n<parameter=action>\nclick\n</parameter>\n<parameter=coordinate>\n[163, 718]\n</parameter>\n</function>\n</tool_call>"
+          },
+          {
+            "role": "tool",
+            "content": "<image>"
+          },
+          {
+            "role": "assistant",
+            "content": "<think>...</think>\n<tool_call>...</tool_call>"
+          }
+        ],
+        "images": [
+          "screenshot_step0.png",
+          "screenshot_step1.png"
+        ],
+        "done": true
+      }
+    },
+    "qwen3vl_json": {
+      "runtime": "qwen3vl_session",
+      "runtime_spec": {
+        "name": "qwen3vl_session",
+        "agent_name": "qwen3vl_session",
+        "description": "Qwen3-VL multi-turn session: <think> + JSON tool_call; query once; screenshots as tool messages."
+      },
+      "tool_call_format": "json",
+      "tool_call_example": "<tool_call>\n{\"name\": \"mobile_use\", \"arguments\": {\"action\": \"click\", \"coordinate\": [163, 718]}}\n</tool_call>",
+      "assistant_turn_shape": "<think>...</think>\n<tool_call>...JSON...</tool_call>",
+      "prompts": {
+        "system": "# Tools\n\nYou may call one or more functions to assist with the user query.\n\nYou are provided with function signatures within <tools></tools> XML tags:\n<tools>\n{\"type\": \"function\", \"function\": {\"name\": \"mobile_use\", \"description\": \"Use a touchscreen to interact with a mobile device, and take screenshots.\\n* This is an interface to a mobile device with touchscreen. You can perform actions like clicking, typing, swiping, etc.\\n* Some applications may take time to start or process actions, so you may need to wait and take successive screenshots to see the results of your actions.\\n* The screen's resolution is 999x999.\\n* Make sure to click any buttons, links, icons, etc with the cursor tip in the center of the element. Don't click boxes on their edges unless asked.\", \"parameters\": {\"properties\": {\"action\": {\"description\": \"The action to perform. The available actions are:\\n* `click`: Click the point on the screen with coordinate (x, y).\\n* `long_press`: Press the point on the screen with coordinate (x, y) for specified seconds.\\n* `swipe`: Swipe from the starting point with coordinate (x, y) to the end point with coordinates2 (x2, y2).\\n* `type`: Input the specified text into the activated input box.\\n* `answer`: Output the answer.\\n* `system_button`: Press the system button.\\n* `wait`: Wait specified seconds for the change to happen.\\n* `terminate`: Terminate the current task and report its completion status.\", \"enum\": [\"click\", \"long_press\", \"swipe\", \"type\", \"answer\", \"system_button\", \"wait\", \"terminate\"], \"type\": \"string\"}, \"coordinate\": {\"description\": \"(x, y): The x (pixels from the left edge) and y (pixels from the top edge) coordinates to move the mouse to. The coordinates should be values from 0 to 999. Required only by `action=click`, `action=long_press`, and `action=swipe`.\", \"type\": \"array\"}, \"coordinate2\": {\"description\": \"(x, y): The x (pixels from the left edge) and y (pixels from the top edge) coordinates to move the mouse to. Required only by `action=swipe`.\", \"type\": \"array\"}, \"text\": {\"description\": \"Required only by `action=type` and `action=answer`.\", \"type\": \"string\"}, \"time\": {\"description\": \"The seconds to wait. Required only by `action=long_press` and `action=wait`.\", \"type\": \"number\"}, \"button\": {\"description\": \"Back means returning to the previous interface, Home means returning to the desktop, Menu means opening the application background menu, and Enter means pressing the enter. Required only by `action=system_button`\", \"enum\": [\"Back\", \"Home\", \"Menu\", \"Enter\"], \"type\": \"string\"}, \"status\": {\"description\": \"The status of the task. Required only by `action=terminate`.\", \"type\": \"string\", \"enum\": [\"success\", \"failure\"]}}, \"required\": [\"action\"], \"type\": \"object\"}}}\n</tools>\n\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\n<tool_call>\n{\"name\": <function-name>, \"arguments\": <args-json-object>}\n</tool_call>\n\n# Session interaction\n\n- The task query is provided only once in the first user message, together with the initial screenshot(s).\n- After each tool call, the environment returns a tool message containing the resulting screenshot(s).\n- All previous assistant responses remain available as the response history.\n- On each turn, inspect the currently provided screenshot(s) and the complete response history, then choose exactly one next action.\n- Do not invent tool messages or screenshot placeholders; they are inserted by the caller.\n- Continue until the task is complete or cannot be completed, then call terminate with the appropriate status.\n\n# Response format\n\nResponse format for every assistant turn:\n1) A <think>...</think> block containing the reasoning for the next move.\n2) A single <tool_call>...</tool_call> block containing only the JSON: {\"name\": <function-name>, \"arguments\": <args-json-object>}.\n\nRules:\n- Output exactly in the order: <think>, <tool_call>.\n- Do not output anything after </tool_call>.\n- If finishing, use action=terminate in the tool call.\n\n# Visual context\n\n- Only the most recent screenshot(s) are provided (controlled by last_n); older screenshots are discarded, but the complete textual response history is still retained.\n- Always base the next action on the currently provided screenshots and the response history.\n- Do not assume access to screenshots that are not currently provided.\n\n# Robustness rules\n\n- If the response history suggests you are stuck repeating similar actions without progress, try a different action.\n- Use the complete response history to avoid repeating actions that have already been performed.\n- Base each action on the currently available screenshots; never assume that an earlier action succeeded without checking its result.",
+        "system_lines": [
+          "# Tools",
+          "",
+          "You may call one or more functions to assist with the user query.",
+          "",
+          "You are provided with function signatures within <tools></tools> XML tags:",
+          "<tools>",
+          "{\"type\": \"function\", \"function\": {\"name\": \"mobile_use\", \"description\": \"Use a touchscreen to interact with a mobile device, and take screenshots.\\n* This is an interface to a mobile device with touchscreen. You can perform actions like clicking, typing, swiping, etc.\\n* Some applications may take time to start or process actions, so you may need to wait and take successive screenshots to see the results of your actions.\\n* The screen's resolution is 999x999.\\n* Make sure to click any buttons, links, icons, etc with the cursor tip in the center of the element. Don't click boxes on their edges unless asked.\", \"parameters\": {\"properties\": {\"action\": {\"description\": \"The action to perform. The available actions are:\\n* `click`: Click the point on the screen with coordinate (x, y).\\n* `long_press`: Press the point on the screen with coordinate (x, y) for specified seconds.\\n* `swipe`: Swipe from the starting point with coordinate (x, y) to the end point with coordinates2 (x2, y2).\\n* `type`: Input the specified text into the activated input box.\\n* `answer`: Output the answer.\\n* `system_button`: Press the system button.\\n* `wait`: Wait specified seconds for the change to happen.\\n* `terminate`: Terminate the current task and report its completion status.\", \"enum\": [\"click\", \"long_press\", \"swipe\", \"type\", \"answer\", \"system_button\", \"wait\", \"terminate\"], \"type\": \"string\"}, \"coordinate\": {\"description\": \"(x, y): The x (pixels from the left edge) and y (pixels from the top edge) coordinates to move the mouse to. The coordinates should be values from 0 to 999. Required only by `action=click`, `action=long_press`, and `action=swipe`.\", \"type\": \"array\"}, \"coordinate2\": {\"description\": \"(x, y): The x (pixels from the left edge) and y (pixels from the top edge) coordinates to move the mouse to. Required only by `action=swipe`.\", \"type\": \"array\"}, \"text\": {\"description\": \"Required only by `action=type` and `action=answer`.\", \"type\": \"string\"}, \"time\": {\"description\": \"The seconds to wait. Required only by `action=long_press` and `action=wait`.\", \"type\": \"number\"}, \"button\": {\"description\": \"Back means returning to the previous interface, Home means returning to the desktop, Menu means opening the application background menu, and Enter means pressing the enter. Required only by `action=system_button`\", \"enum\": [\"Back\", \"Home\", \"Menu\", \"Enter\"], \"type\": \"string\"}, \"status\": {\"description\": \"The status of the task. Required only by `action=terminate`.\", \"type\": \"string\", \"enum\": [\"success\", \"failure\"]}}, \"required\": [\"action\"], \"type\": \"object\"}}}",
+          "</tools>",
+          "",
+          "For each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:",
+          "<tool_call>",
+          "{\"name\": <function-name>, \"arguments\": <args-json-object>}",
+          "</tool_call>",
+          "",
+          "# Session interaction",
+          "",
+          "- The task query is provided only once in the first user message, together with the initial screenshot(s).",
+          "- After each tool call, the environment returns a tool message containing the resulting screenshot(s).",
+          "- All previous assistant responses remain available as the response history.",
+          "- On each turn, inspect the currently provided screenshot(s) and the complete response history, then choose exactly one next action.",
+          "- Do not invent tool messages or screenshot placeholders; they are inserted by the caller.",
+          "- Continue until the task is complete or cannot be completed, then call terminate with the appropriate status.",
+          "",
+          "# Response format",
+          "",
+          "Response format for every assistant turn:",
+          "1) A <think>...</think> block containing the reasoning for the next move.",
+          "2) A single <tool_call>...</tool_call> block containing only the JSON: {\"name\": <function-name>, \"arguments\": <args-json-object>}.",
+          "",
+          "Rules:",
+          "- Output exactly in the order: <think>, <tool_call>.",
+          "- Do not output anything after </tool_call>.",
+          "- If finishing, use action=terminate in the tool call.",
+          "",
+          "# Visual context",
+          "",
+          "- Only the most recent screenshot(s) are provided (controlled by last_n); older screenshots are discarded, but the complete textual response history is still retained.",
+          "- Always base the next action on the currently provided screenshots and the response history.",
+          "- Do not assume access to screenshots that are not currently provided.",
+          "",
+          "# Robustness rules",
+          "",
+          "- If the response history suggests you are stuck repeating similar actions without progress, try a different action.",
+          "- Use the complete response history to avoid repeating actions that have already been performed.",
+          "- Base each action on the currently available screenshots; never assume that an earlier action succeeded without checking its result."
+        ],
+        "user": "The user query: {instruction}\n"
+      },
+      "message_schema_example": {
+        "id": "task_name",
+        "runtime": "qwen3vl_session",
+        "messages": [
+          {
+            "role": "system",
+            "content": "# Tools\n\nYou may call one or more functions to assist with the user query.\n\nYou are provided with function signatures within <tools></tools> XML tags:\n<tools>\n{\"type\": \"function\", \"function\": {\"name\": \"mobile_use\", \"description\": \"Use a touchscreen to interact with a mobile device, and take screenshots.\\n* This is an interface to a mobile device with touchscreen. You can perform actions like clicking, typing, swiping, etc.\\n* Some applications may take time to start or process actions, so you may need to wait and take successive screenshots to see the results of your actions.\\n* The screen's resolution is 999x999.\\n* Make sure to click any buttons, links, icons, etc with the cursor tip in the center of the element. Don't click boxes on their edges unless asked.\", \"parameters\": {\"properties\": {\"action\": {\"description\": \"The action to perform. The available actions are:\\n* `click`: Click the point on the screen with coordinate (x, y).\\n* `long_press`: Press the point on the screen with coordinate (x, y) for specified seconds.\\n* `swipe`: Swipe from the starting point with coordinate (x, y) to the end point with coordinates2 (x2, y2).\\n* `type`: Input the specified text into the activated input box.\\n* `answer`: Output the answer.\\n* `system_button`: Press the system button.\\n* `wait`: Wait specified seconds for the change to happen.\\n* `terminate`: Terminate the current task and report its completion status.\", \"enum\": [\"click\", \"long_press\", \"swipe\", \"type\", \"answer\", \"system_button\", \"wait\", \"terminate\"], \"type\": \"string\"}, \"coordinate\": {\"description\": \"(x, y): The x (pixels from the left edge) and y (pixels from the top edge) coordinates to move the mouse to. The coordinates should be values from 0 to 999. Required only by `action=click`, `action=long_press`, and `action=swipe`.\", \"type\": \"array\"}, \"coordinate2\": {\"description\": \"(x, y): The x (pixels from the left edge) and y (pixels from the top edge) coordinates to move the mouse to. Required only by `action=swipe`.\", \"type\": \"array\"}, \"text\": {\"description\": \"Required only by `action=type` and `action=answer`.\", \"type\": \"string\"}, \"time\": {\"description\": \"The seconds to wait. Required only by `action=long_press` and `action=wait`.\", \"type\": \"number\"}, \"button\": {\"description\": \"Back means returning to the previous interface, Home means returning to the desktop, Menu means opening the application background menu, and Enter means pressing the enter. Required only by `action=system_button`\", \"enum\": [\"Back\", \"Home\", \"Menu\", \"Enter\"], \"type\": \"string\"}, \"status\": {\"description\": \"The status of the task. Required only by `action=terminate`.\", \"type\": \"string\", \"enum\": [\"success\", \"failure\"]}}, \"required\": [\"action\"], \"type\": \"object\"}}}\n</tools>\n\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\n<tool_call>\n{\"name\": <function-name>, \"arguments\": <args-json-object>}\n</tool_call>\n\n# Session interaction\n\n- The task query is provided only once in the first user message, together with the initial screenshot(s).\n- After each tool call, the environment returns a tool message containing the resulting screenshot(s).\n- All previous assistant responses remain available as the response history.\n- On each turn, inspect the currently provided screenshot(s) and the complete response history, then choose exactly one next action.\n- Do not invent tool messages or screenshot placeholders; they are inserted by the caller.\n- Continue until the task is complete or cannot be completed, then call terminate with the appropriate status.\n\n# Response format\n\nResponse format for every assistant turn:\n1) A <think>...</think> block containing the reasoning for the next move.\n2) A single <tool_call>...</tool_call> block containing only the JSON: {\"name\": <function-name>, \"arguments\": <args-json-object>}.\n\nRules:\n- Output exactly in the order: <think>, <tool_call>.\n- Do not output anything after </tool_call>.\n- If finishing, use action=terminate in the tool call.\n\n# Visual context\n\n- Only the most recent screenshot(s) are provided (controlled by last_n); older screenshots are discarded, but the complete textual response history is still retained.\n- Always base the next action on the currently provided screenshots and the response history.\n- Do not assume access to screenshots that are not currently provided.\n\n# Robustness rules\n\n- If the response history suggests you are stuck repeating similar actions without progress, try a different action.\n- Use the complete response history to avoid repeating actions that have already been performed.\n- Base each action on the currently available screenshots; never assume that an earlier action succeeded without checking its result."
+          },
+          {
+            "role": "user",
+            "content": "The user query: {instruction}\n<image>"
+          },
+          {
+            "role": "assistant",
+            "content": "<think>...</think>\n<tool_call>\n{\"name\": \"mobile_use\", \"arguments\": {\"action\": \"click\", \"coordinate\": [163, 718]}}\n</tool_call>"
+          },
+          {
+            "role": "tool",
+            "content": "<image>"
+          },
+          {
+            "role": "assistant",
+            "content": "<think>...</think>\n<tool_call>...</tool_call>"
+          }
+        ],
+        "images": [
+          "screenshot_step0.png",
+          "screenshot_step1.png"
+        ],
+        "done": true
+      }
+    }
+  }
+}

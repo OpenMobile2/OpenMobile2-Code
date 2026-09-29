@@ -1,0 +1,73 @@
+.DS_Store
+
+# Python cache and bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Packaging / build artifacts
+.Python
+build/
+dist/
+.eggs/
+*.egg-info/
+pip-wheel-metadata/
+
+# Virtual environments (root-only; do not ignore android_world/env/)
+.venv/
+venv/
+/env/
+
+# Test and coverage outputs
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Logs
+*.log
+
+# IDE / editor files
+.idea/
+.vscode/
+.cursor/
+
+# MobileWorld runs and eval outputs (kept locally, not uploaded)
+MobileWorld/runs/
+MobileWorld/explore_results/
+MobileWorld/pipeline_runs/
+MobileWorld/pipeline_runs1/
+MobileWorld/pipeline_runs_agent_success1/
+MobileWorld/eval_runs/
+MobileWorld/eval-gui/
+MobileWorld/eval-mcp/
+
+# AndroidWorld runs
+AndroidWorld/runs/
+AndroidWorld/session/
+AndroidWorld/tasks/
+AndroidWorld/output/
+AndroidWorld/run_diy/
+AndroidWorld/run_diy_agent_success/
+AndroidWorld/run_example/
+
+# task_synthesis output
+task_synthesis/output/
+
+# MobileGym runs and eval outputs (kept locally, not uploaded)
+MobileGym/pipeline_runs/
+MobileGym/tasks/
+MobileGym/runs/
+MobileGym/runs_main/
+
+# MobileGymPP runs and eval outputs (kept locally, not uploaded)
+MobileGymPP/eval_runs/
+MobileGymPP/runs/
+MobileGymPP/runs_rollout/
+MobileGymPP/_bundle_cache/
+MobileGymPP/list_err.txt
+MobileGymPP/gui-mcp/
+/scripts/output/

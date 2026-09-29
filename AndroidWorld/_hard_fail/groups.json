@@ -1,0 +1,47 @@
+{
+  "source": "Qwen3.5-9B six-run analysis: 0815-seed{20,30,40} + 0820-ep2-seed{20,30,40}",
+  "score": "mean_success_rate; empty OsmAndMarker counted as 0",
+  "groups": {
+    "never": {
+      "label": "全做错",
+      "rule": "0/6 successes",
+      "n": 18,
+      "tasks": [
+        "AudioRecorderRecordAudioWithFileName",
+        "BrowserDraw",
+        "ExpenseAddMultipleFromGallery",
+        "ExpenseAddMultipleFromMarkor",
+        "MarkorAddNoteHeader",
+        "MarkorMergeNotes",
+        "MarkorTranscribeVideo",
+        "NotesIsTodo",
+        "OsmAndTrack",
+        "RecipeAddMultipleRecipesFromImage",
+        "RecipeAddMultipleRecipesFromMarkor",
+        "RecipeAddMultipleRecipesFromMarkor2",
+        "RecipeDeleteDuplicateRecipes3",
+        "RetroPlaylistDuration",
+        "SportsTrackerActivitiesOnDate",
+        "SystemBrightnessMax",
+        "TasksDueNextWeek",
+        "TasksHighPriorityTasksDueOnDate"
+      ]
+    },
+    "lt50": {
+      "label": "易做错",
+      "rule": "1/6 or 2/6 successes (success rate < 50%)",
+      "n": 9,
+      "tasks": [
+        "MarkorCreateNoteFromClipboard",
+        "OsmAndMarker",
+        "RecipeDeleteDuplicateRecipes2",
+        "SimpleCalendarEventsInNextWeek",
+        "SimpleCalendarNextEvent",
+        "SimpleSmsSendClipboardContent",
+        "TasksCompletedTasksForDate",
+        "RecipeAddMultipleRecipes",
+        "SportsTrackerActivitiesCountForWeek"
+      ]
+    }
+  }
+}

@@ -1,0 +1,53 @@
+# Hard-fail 子集评测
+
+本目录独立于 AndroidWorld 源码。删掉整个 `_hard_fail/` 即可撤销；换任务名单只改 `groups.json`。
+
+来源：Qwen3.5-9B 六次评测（0815-seed{20,30,40} + 0820-ep2-seed{20,30,40}），score = mean_success_rate。
+
+| 分组 | 参数 | 规则 | 任务数 |
+| --- | --- | --- | --- |
+| 全做错 | `never` | 6/6 均为 0 | 18 |
+| 易做错 | `lt50` | 1/6 或 2/6 成功（成功率 < 50%） | 9 |
+| 两者 | `hard`（默认） | never + lt50 | 27 |
+
+## 评测
+
+在 `AndroidWorld/` 下运行。第一个参数是分组，后面参数原样转给 `run.py`（不要再传 `--tasks`）。
+
+只测 27 个 hard 任务（推荐）：
+
+```bash
+cd AndroidWorld
+./_hard_fail/run.sh hard \
+  --runtime qwen35_session \
+  --enable_thinking=true \
+  --require_think_tags=false \
+  --last_n 3 \
+  --console_port 5556 \
+  --grpc_port 8556 \
+  --perform_emulator_setup=true \
+  --model_base_url http://127.0.0.1:18000/v1 \
+  --model_api_key EMPTY \
+  --model_name Qwen3.5-9B \
+  --checkpoint_dir runs/hard-fail-seed20 \
+  --task_random_seed 20
+```
+
+只测全做错 18 个：把 `hard` 换成 `never`。只测易做错 9 个：换成 `lt50`。
+
+## 事后拆组统计
+
+对已有 `result_*.csv`（全量或子集都可以）：
+
+```bash
+cd AndroidWorld
+./_hard_fail/run.sh summarize /Users/yanchenyang/code/openmobile2/openmobile-new/AndroidWorld/runs/hard-fail-seed20/result_grouped_20260824_230311.csv
+```
+
+会在同目录写出 `result_*_grouped.csv`，末尾三行分别是：
+
+- `========= 全做错 =========`
+- `========= 易做错 =========`
+- `========= Average =========`
+
+评测跑完后，wrapper 也会把带分组的结果写到 `--checkpoint_dir` 下的 `result_grouped_*.csv`。

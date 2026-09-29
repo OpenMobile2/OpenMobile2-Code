@@ -1,0 +1,8 @@
+{"id": "smoke_clock_alarm", "instruction": "Set an alarm for 7:00 in Clock.", "apps": ["Clock"], "difficulty": "easy"}
+{"id": "smoke_settings_brightness", "instruction": "Turn the display brightness to the maximum in Settings.", "apps": ["Settings"], "difficulty": "easy"}
+{"id": "smoke_notes_new", "instruction": "Create a new note in Notes titled Shopping.", "apps": ["Notes"], "difficulty": "easy"}
+{"id": "smoke_calculator", "instruction": "Open Calculator and compute 128 plus 256.", "apps": ["Calculator"], "difficulty": "easy"}
+{"id": "smoke_weather", "instruction": "Check today's weather in the Weather app.", "apps": ["Weather"], "difficulty": "easy"}
+{"id": "smoke_calendar_today", "instruction": "Open Calendar and look at today's events.", "apps": ["Calendar"], "difficulty": "easy"}
+{"id": "smoke_clock_world", "instruction": "Open Clock and add London to the world clock list.", "apps": ["Clock"], "difficulty": "easy"}
+{"id": "smoke_settings_wifi", "instruction": "Open Settings and turn Wi-Fi off.", "apps": ["Settings"], "difficulty": "easy"}
