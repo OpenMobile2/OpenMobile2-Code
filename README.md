@@ -18,17 +18,51 @@ Set `YOUR_MODEL` and `http://<openai-compatible-host>/v1` to your OpenAI-compati
 
 ## 📋 Contents
 
-- [Runtimes](#runtimes)
-- [AndroidWorld](#androidworld)
-- [MobileGym](#mobilegym)
-- [MobileWorld](#mobileworld)
-- [MobileGym++ Bench](#mobilegym-bench)
-- [Data synthesis](#data-synthesis)
+- [Environment setup](#environment-setup)
+- [Evaluation](#evaluation)
+  - [Runtimes](#runtimes)
+  - [AndroidWorld](#androidworld)
+  - [MobileGym](#mobilegym)
+  - [MobileWorld](#mobileworld)
+  - [MobileGym++ Bench](#mobilegym-bench)
+- [Training](#training)
 - [Acknowledgements](#acknowledgements)
 - [License](#license)
 
+<a id="environment-setup"></a>
+## ⚙️ Environment setup
+
+Install one Python environment, `android_world`, and use it for every eval in this repository. Details, including the protobuf pin, are in [`AndroidWorld/environment.md`](AndroidWorld/environment.md).
+
+```bash
+conda create -n android_world python=3.11.8
+conda activate android_world
+cd <OPENMOBILE_ROOT>/AndroidWorld
+python -m pip install -r requirements.txt
+conda install -c conda-forge opencv
+python setup.py install
+python -m pip install -e android_env
+python -m pip install openai pillow tqdm ImageHash sentence-transformers
+```
+
+On Windows the PowerShell launchers look for this environment at `%USERPROFILE%\miniconda3\envs\android_world\python.exe`. Pass `-PythonExe` if it lives somewhere else.
+
+Each benchmark's device, frontend, or emulator is installed from that project's own instructions:
+
+| Benchmark | Setup |
+|---|---|
+| AndroidWorld | [AndroidWorld](https://github.com/google-research/android_world) and [`AndroidWorld/environment.md`](AndroidWorld/environment.md) |
+| MobileGym | [mobilegym](https://github.com/Purewhiter/mobilegym) and [`MobileGym/README.md`](MobileGym/README.md) |
+| MobileWorld | [MobileWorld](https://github.com/Tongyi-MAI/MobileWorld) and [`MobileWorld/README.md`](MobileWorld/README.md) |
+| MobileGym++ | [`MobileGymPP/README.md`](MobileGymPP/README.md) |
+
+Point every eval command at `http://<openai-compatible-host>/v1` and set the model name with `YOUR_MODEL`. Local servers can use `EMPTY` as the API key.
+
+<a id="evaluation"></a>
+## 📊 Evaluation
+
 <a id="runtimes"></a>
-## 🤗 Runtimes
+### 🤗 Runtimes
 
 | `--runtime` | What the model sees | Typical `last_n` |
 |---|---|---|
@@ -37,14 +71,26 @@ Set `YOUR_MODEL` and `http://<openai-compatible-host>/v1` to your OpenAI-compati
 | `venus` | Current screenshot only. Output is `<think>`, `<action>`, `<conclusion>`. | ignored |
 | `gui_owl` | MobileGym / MobileGym++ official GUI-Owl adapter. The prompt stays in that benchmark. | benchmark default |
 
-`qwen35_session` remains in code for older rollout (native thinking and API `tools=`). New evaluation commands use `qwen35_thought_session`. Format notes: [`runtimes/qwen35_thought_session.md`](runtimes/qwen35_thought_session.md).
 
 `gui_owl` is not implemented inside `runtimes/`. Pass it as the benchmark agent name.
 
 <a id="androidworld"></a>
-## 📊 AndroidWorld
+### AndroidWorld
 
-Emulator and ADB setup follow the [AndroidWorld](https://github.com/google-research/android_world) instructions. Python environment: [`AndroidWorld/environment.md`](AndroidWorld/environment.md).
+Python environment: [`AndroidWorld/environment.md`](AndroidWorld/environment.md). The AVD itself follows the [AndroidWorld](https://github.com/google-research/android_world) instructions. Leave the emulator running while the eval is in progress. Console port `5554` and gRPC port `8554` must match the eval flags below.
+
+#### 1. Start the AndroidWorld emulator / ADB environment
+
+On macOS the emulator binary is `~/Library/Android/sdk/emulator/emulator`.
+
+```bash
+EMULATOR_NAME=AndroidWorldAvd
+~/Library/Android/sdk/emulator/emulator -avd $EMULATOR_NAME -port 5554 -no-snapshot -grpc 8554
+```
+
+#### 2. Run evaluation
+
+`--perform_emulator_setup=true` is required once on a fresh AVD. After that, drop the flag.
 
 ```bash
 cd AndroidWorld
@@ -78,19 +124,25 @@ python run.py \
 Results are written under `--checkpoint_dir`.
 
 <a id="mobilegym"></a>
-## 📊 MobileGym
+### MobileGym
 
-Official MobileGym frontend (Playwright). Start it yourself, then point the eval at that URL.
+Official MobileGym frontend (Playwright). The eval talks to the URL you start below.
+
+#### 1. Start the MobileGym frontend
 
 ```bash
-cd "$MOBILEGYM_FRONTEND"
-npm run preview -- --host 127.0.0.1 --port 4173
+cd <PARENT>/mobilegym/mobilegym
+npm run preview -- --host 127.0.0.1 --port 4172
 ```
+
+#### 2. Run evaluation
+
+`-EnvUrl` and `-Port` must match the preview above.
 
 ```powershell
 cd <OPENMOBILE_ROOT>\MobileGym
 .\run_eval_session.ps1 -Runtime qwen35_thought_session -ModelName YOUR_MODEL `
-  -ModelBaseUrl http://<openai-compatible-host>/v1 -EnvUrl http://127.0.0.1:4173 -Port 4173
+  -ModelBaseUrl http://<openai-compatible-host>/v1 -EnvUrl http://127.0.0.1:4172 -Port 4172
 .\run_eval_session.ps1 -Runtime qwen3vl -ModelName OpenMobile-8B `
   -ModelBaseUrl http://<openai-compatible-host>/v1
 .\run_eval_session.ps1 -Runtime venus -ModelName UI-Venus-1.5-8B `
@@ -99,17 +151,27 @@ cd <OPENMOBILE_ROOT>\MobileGym
   -ModelBaseUrl http://<openai-compatible-host>/v1
 ```
 
-`-Runtime` is `qwen35_thought_session` (default, last_n 3), `qwen3vl` (last_n 1), `venus` (last_n 1), or `gui_owl`. `qwen35_session` is still accepted. Output is `MobileGym/runs_main/<ModelName>` with dots removed. `qwen3vl` writes `runs_main/qwen3vl/<ModelName>` so it does not resume an older folder of the same model name. An existing `meta.json` resumes unfinished tasks.
+`-Runtime` is `qwen35_thought_session` (default, last_n 3), `qwen3vl` (last_n 1), `venus` (last_n 1), or `gui_owl`. `qwen35_session` is still accepted. Output is `MobileGym/runs_main/<ModelName>` with dots removed.
 
 <a id="mobileworld"></a>
-## 📊 MobileWorld
+### MobileWorld
 
 HTTP backends, one host per worker. GUI tasks and MCP tasks are separate runs. Do not put both on the same hosts at the same time.
 
+#### 1. Start the MobileWorld backends
+
+`--count 2` serves `http://127.0.0.1:6800` and `http://127.0.0.1:6801`.
+
 ```bash
-cd /path/to/MobileWorld
+cd <PARENT>/MobileWorld
 uv run mw env run --count 2
 ```
+
+#### 2. Run evaluation
+
+`--hosts` must be the backends started above.
+
+GUI tasks:
 
 ```powershell
 cd <OPENMOBILE_ROOT>\MobileWorld
@@ -124,7 +186,7 @@ python parallel_eval_mw.py `
   --qwen3vl_model_api_key EMPTY
 ```
 
-MCP tasks use the same runtime and add `--mcp_only`:
+MCP tasks use the same runtime and add `--mcp_only`. Run this only after the GUI run has released those hosts, or point it at a different pair:
 
 ```powershell
 python parallel_eval_mw.py `
@@ -142,14 +204,20 @@ python parallel_eval_mw.py `
 Summaries are `eval_summary.json` inside each output directory. Flat OpenMobile-8B is `--runtime qwen3vl --last_n 1` on the GUI run (MCP expects a session runtime).
 
 <a id="mobilegym-bench"></a>
-## 📊 MobileGym++ Bench
+### MobileGym++ Bench
 
-bench215 on the mock frontend: `gui_only` and `hybrid`. Start the mock on a different port from official MobileGym.
+bench215 on the mock frontend: `gui_only` and `hybrid`. Use a different port from official MobileGym (`4172`).
+
+#### 1. Start the MobileGym++ mock frontend
 
 ```powershell
 cd <MOBILEGYM_MOCK_ROOT>\trial_apps\mobilegym
 npm run preview -- --host 127.0.0.1 --port 4173
 ```
+
+#### 2. Run evaluation
+
+`-Port` must match the preview above.
 
 ```powershell
 cd <OPENMOBILE_ROOT>\MobileGymPP
@@ -163,12 +231,26 @@ cd <OPENMOBILE_ROOT>\MobileGymPP
 
 `-Runtime` is `qwen35_thought_session`, `qwen3vl`, `venus`, `gui_owl`, or `mai_ui`. `-Mode gui_only` or `-Mode hybrid` runs one side. Output is `MobileGymPP/eval_runs/<ModelName>/bench215-mock/` with `gui_only` and `hybrid` subdirectories. Pass `-OutputDir` to write somewhere else.
 
-<a id="data-synthesis"></a>
-## 🎮 Data synthesis
+<a id="training"></a>
+## 🎯 Training
 
-Task synthesis is [`task_synthesis/`](task_synthesis/). AndroidWorld, MobileWorld, and MobileGym each have an explore / rollout pipeline (`run_diy.py`, `run_diy_mw.py`, `run_diy_mg.py`) that calls the same `runtimes/` presets. Those paths are not required to run the four evaluations.
+We fine-tune OpenMobile-2 models with [ms-swift](https://github.com/modelscope/ms-swift). The SFT data is released as [OpenMobile-2/OpenMobile-Data](https://huggingface.co/datasets/OpenMobile-2/OpenMobile-Data).
 
-Local eval dumps (`runs_main/`, `eval-gui/`, `eval-mcp/`, `eval_runs/`, and the other directories in [`.gitignore`](.gitignore)) stay on disk and are not part of the release.
+The public training files are `emulator/train.json`, `simulator/gui-only/train.json`, and `simulator/hybrid/train.json`. `dataset_info.json` registers them as `emulator_qwen35_last3_noloop_notitle_nocoord_think_thought`, `mobilegym_qwen35_last3_noloop_notitle_nocoord_think_thought`, and `gui_mcp_qwen35_last3_noloop_notitle_nocoord_think_thought`.
+
+Image paths inside each JSON are relative to that file. Download the full repository so the screenshots resolve.
+
+```bash
+hf download OpenMobile-2/OpenMobile-Data --repo-type dataset --local-dir OpenMobile-Data
+
+swift sft \
+  --custom_dataset_info OpenMobile-Data/dataset_info.json \
+  --dataset emulator_qwen35_last3_noloop_notitle_nocoord_think_thought \
+            mobilegym_qwen35_last3_noloop_notitle_nocoord_think_thought \
+            gui_mcp_qwen35_last3_noloop_notitle_nocoord_think_thought
+```
+
+Please adjust `model`, batch size, and output paths according to your local ms-swift setup and hardware.
 
 <a id="acknowledgements"></a>
 ## 💐 Acknowledgements
