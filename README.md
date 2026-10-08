@@ -12,7 +12,6 @@ OpenMobile-2 performs competitively across established benchmarks, including And
   <img src="assets/openmobile2.png" alt="OpenMobile-2" width="900">
 </p>
 
-Set `YOUR_MODEL` and `http://<openai-compatible-host>/v1` to your OpenAI-compatible server. API keys go in the environment, not in this file.
 
 ## 📋 Contents
 
