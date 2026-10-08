@@ -12,8 +12,6 @@ OpenMobile-2 performs competitively across established benchmarks, including And
   <img src="assets/openmobile2.png" alt="OpenMobile-2" width="900">
 </p>
 
-This repository evaluates those agents. Model dialogue (prompts, history, tool-call format) lives in [`runtimes/`](runtimes/) and does not know which device it is talking to. Each benchmark only turns the parsed action into an environment step.
-
 Set `YOUR_MODEL` and `http://<openai-compatible-host>/v1` to your OpenAI-compatible server. API keys go in the environment, not in this file.
 
 ## 📋 Contents
