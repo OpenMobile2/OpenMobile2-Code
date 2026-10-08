@@ -259,7 +259,7 @@ Please adjust `model`, batch size, and output paths according to your local ms-s
 [MobileWorld](https://github.com/Tongyi-MAI/MobileWorld)&#8194;
 [MobileGym](https://github.com/Purewhiter/mobilegym)&#8194;
 [Qwen-VL](https://github.com/QwenLM/Qwen3-VL)&#8194;
-[LlamaFactory](https://github.com/hiyouga/LlamaFactory)
+[ms-swift](https://github.com/modelscope/ms-swift)
 
 <a id="license"></a>
 ## ⚖️ License
