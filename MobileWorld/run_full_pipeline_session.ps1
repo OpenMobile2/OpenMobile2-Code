@@ -189,9 +189,9 @@ $pyArgs = @(
     "--start_from", $StartFrom,
     "--stop_after", $StopAfter,
     "--no_upload",
-    "--qwen3vl_model_base_url", $ModelBaseUrl,
-    "--qwen3vl_model_name", $ModelName,
-    "--qwen3vl_model_api_key", $ApiKey,
+    "--model_base_url", $ModelBaseUrl,
+    "--model_name", $ModelName,
+    "--model_api_key", $ApiKey,
     "--openai_base_url", $ModelBaseUrl,
     "--openai_api_key", $ApiKey,
     "--openai_model", $ModelName

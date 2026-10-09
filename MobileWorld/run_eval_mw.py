@@ -13,9 +13,9 @@ Example (single backend):
     --runtime qwen35_thought_session \\
     --last_n 3 \\
     --tasks ALL \\
-    --qwen3vl_model_base_url https://<openai-compatible-host>/v1 \\
-    --qwen3vl_model_name gemini-3.1-pro-preview \\
-    --qwen3vl_model_api_key YOUR_KEY
+    --model_base_url https://<openai-compatible-host>/v1 \\
+    --model_name gemini-3.1-pro-preview \\
+    --model_api_key YOUR_KEY
 
 MCP tasks only (session + DashScope/ModelScope tools):
   python parallel_eval_mw.py \\
@@ -97,12 +97,12 @@ def _build_agent(args: argparse.Namespace, env: interface.AsyncEnv) -> base_agen
         require_think_tags=args.require_think_tags,
         qwen35_tool_call_mode=args.qwen35_tool_call_mode,
         reasoning_effort=args.reasoning_effort,
-        model_base_url=args.qwen3vl_model_base_url,
-        model_api_key=args.qwen3vl_model_api_key,
-        model_name=args.qwen3vl_model_name,
-        weak_model_base_url=args.qwen3vl_switching_weak_model_base_url,
-        weak_model_api_key=args.qwen3vl_switching_weak_model_api_key,
-        weak_model_name=args.qwen3vl_switching_weak_model_name,
+        model_base_url=args.model_base_url,
+        model_api_key=args.model_api_key,
+        model_name=args.model_name,
+        weak_model_base_url=args.switching_weak_model_base_url,
+        weak_model_api_key=args.switching_weak_model_api_key,
+        weak_model_name=args.switching_weak_model_name,
     )
     print(f"Runtime: {spec.name} (last_n={args.last_n}; {spec.description})")
     return agent
@@ -319,12 +319,12 @@ def main() -> int:
         default="auto",
         choices=["auto", "qwen3vl", "qwen35"],
     )
-    parser.add_argument("--qwen3vl_model_base_url", type=str, default="http://<openai-compatible-host>/v1")
-    parser.add_argument("--qwen3vl_model_name", type=str, default="")
-    parser.add_argument("--qwen3vl_model_api_key", type=str, default="EMPTY")
-    parser.add_argument("--qwen3vl_switching_weak_model_base_url", type=str, default="")
-    parser.add_argument("--qwen3vl_switching_weak_model_name", type=str, default="")
-    parser.add_argument("--qwen3vl_switching_weak_model_api_key", type=str, default="EMPTY")
+    parser.add_argument("--model_base_url", type=str, default="http://<openai-compatible-host>/v1")
+    parser.add_argument("--model_name", type=str, default="")
+    parser.add_argument("--model_api_key", type=str, default="EMPTY")
+    parser.add_argument("--switching_weak_model_base_url", type=str, default="")
+    parser.add_argument("--switching_weak_model_name", type=str, default="")
+    parser.add_argument("--switching_weak_model_api_key", type=str, default="EMPTY")
     parser.add_argument("--shard_index", type=int, default=0)
     parser.add_argument("--num_shards", type=int, default=1)
     parser.add_argument(

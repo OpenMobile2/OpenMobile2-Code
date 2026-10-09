@@ -31,9 +31,9 @@ Examples:
   python run_full_pipeline_mg.py \\
     --env_urls http://127.0.0.1:3000 \\
     --use_memgui_prompt \\
-    --qwen3vl_model_base_url https://<openai-compatible-host>/v1 \\
-    --qwen3vl_model_name gemini-3.1-pro-preview \\
-    --qwen3vl_model_api_key YOUR_KEY
+    --model_base_url https://<openai-compatible-host>/v1 \\
+    --model_name gemini-3.1-pro-preview \\
+    --model_api_key YOUR_KEY
 
   # Only first 50 easy tasks
   python run_full_pipeline_mg.py \\
@@ -149,9 +149,9 @@ def stage_rollout(args: argparse.Namespace, p: dict[str, Path], env_urls: list[s
         f"--agent_name={args.agent_name}",
         f"--max_n_steps={args.max_n_steps}",
         f"--step_wait_time={args.step_wait_time}",
-        f"--qwen3vl_model_base_url={args.qwen3vl_model_base_url}",
-        f"--qwen3vl_model_name={args.qwen3vl_model_name}",
-        f"--qwen3vl_model_api_key={args.qwen3vl_model_api_key}",
+        f"--model_base_url={args.model_base_url}",
+        f"--model_name={args.model_name}",
+        f"--model_api_key={args.model_api_key}",
         f"--memgui_prompt_format={args.memgui_prompt_format}",
     ]
     if getattr(args, "runtime", ""):
@@ -170,17 +170,17 @@ def stage_rollout(args: argparse.Namespace, p: dict[str, Path], env_urls: list[s
         cmd.append("--use_memory_prompt")
     if args.no_headless:
         cmd.append("--no_headless")
-    if args.qwen3vl_switching_weak_model_base_url:
+    if args.switching_weak_model_base_url:
         cmd.append(
-            f"--qwen3vl_switching_weak_model_base_url={args.qwen3vl_switching_weak_model_base_url}"
+            f"--switching_weak_model_base_url={args.switching_weak_model_base_url}"
         )
-    if args.qwen3vl_switching_weak_model_name:
+    if args.switching_weak_model_name:
         cmd.append(
-            f"--qwen3vl_switching_weak_model_name={args.qwen3vl_switching_weak_model_name}"
+            f"--switching_weak_model_name={args.switching_weak_model_name}"
         )
-    if args.qwen3vl_switching_weak_model_api_key:
+    if args.switching_weak_model_api_key:
         cmd.append(
-            f"--qwen3vl_switching_weak_model_api_key={args.qwen3vl_switching_weak_model_api_key}"
+            f"--switching_weak_model_api_key={args.switching_weak_model_api_key}"
         )
     _run(cmd, cwd=_HERE)
 
@@ -220,12 +220,12 @@ def stage_refine(
         f"--mode={mode}",
         f"--workers={args.refine_workers}",
     ]
-    if args.openai_base_url or args.qwen3vl_model_base_url:
-        cmd.append(f"--base-url={args.openai_base_url or args.qwen3vl_model_base_url}")
-    if args.openai_api_key or args.qwen3vl_model_api_key:
-        cmd.append(f"--api-key={args.openai_api_key or args.qwen3vl_model_api_key}")
-    if args.openai_model or args.qwen3vl_model_name:
-        cmd.append(f"--model={args.openai_model or args.qwen3vl_model_name}")
+    if args.openai_base_url or args.model_base_url:
+        cmd.append(f"--base-url={args.openai_base_url or args.model_base_url}")
+    if args.openai_api_key or args.model_api_key:
+        cmd.append(f"--api-key={args.openai_api_key or args.model_api_key}")
+    if args.openai_model or args.model_name:
+        cmd.append(f"--model={args.openai_model or args.model_name}")
     _run(cmd, cwd=script.parent)
     if not output_path.exists():
         raise FileNotFoundError(f"Missing refine output: {output_path}")
@@ -332,9 +332,9 @@ def main() -> int:
     parser.add_argument("--max_n_steps", type=int, default=30)
     parser.add_argument("--step_wait_time", type=float, default=1.0)
     parser.add_argument("--no_headless", action="store_true")
-    parser.add_argument("--qwen3vl_model_base_url", type=str, default="http://<openai-compatible-host>/v1")
-    parser.add_argument("--qwen3vl_model_name", type=str, default="")
-    parser.add_argument("--qwen3vl_model_api_key", type=str, default="EMPTY")
+    parser.add_argument("--model_base_url", type=str, default="http://<openai-compatible-host>/v1")
+    parser.add_argument("--model_name", type=str, default="")
+    parser.add_argument("--model_api_key", type=str, default="EMPTY")
     parser.add_argument("--use_memgui_prompt", action="store_true")
     parser.add_argument("--use_memory_prompt", action="store_true")
     parser.add_argument(
@@ -343,9 +343,9 @@ def main() -> int:
         default="auto",
         choices=["auto", "qwen3vl", "qwen35"],
     )
-    parser.add_argument("--qwen3vl_switching_weak_model_base_url", type=str, default="")
-    parser.add_argument("--qwen3vl_switching_weak_model_name", type=str, default="")
-    parser.add_argument("--qwen3vl_switching_weak_model_api_key", type=str, default="EMPTY")
+    parser.add_argument("--switching_weak_model_base_url", type=str, default="")
+    parser.add_argument("--switching_weak_model_name", type=str, default="")
+    parser.add_argument("--switching_weak_model_api_key", type=str, default="EMPTY")
 
     # refine
     parser.add_argument("--refine_workers", type=int, default=16)

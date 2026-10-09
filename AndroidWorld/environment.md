@@ -1,11 +1,8 @@
 # OpenMobile Environment Setup (macOS / conda / Python 3.11)
 
-This document records a practical setup workflow for the OpenMobile framework.
+This file is the Python environment used by every eval in this repository. Create the AndroidWorld AVD from the [AndroidWorld](https://github.com/google-research/android_world) instructions. Evaluation commands are in the repository [README](../README.md).
 
-The recommended setup is to use a single conda environment, `android_world`, for both:
-
-- `AndroidWorld/` (evaluation, exploration, rollout, post-processing)
-- `task_synthesis/` (task synthesis from exploration results)
+Use one conda environment, `android_world`, for every eval in this repository.
 
 ---
 
@@ -40,18 +37,13 @@ python setup.py install
 
 ---
 
-### 3) Install model API and task-synthesis dependencies
+### 3) Install model API dependencies
 
-The task synthesis code under `OpenMobile/task_synthesis` uses a few extra libraries that are not covered by `AndroidWorld/requirements.txt`.
+These are used by the eval agents and are not covered by `AndroidWorld/requirements.txt`.
 
 ```bash
-python -m pip install openai pillow tqdm ImageHash sentence-transformers
+python -m pip install openai pillow
 ```
-
-Notes:
-
-- `openai` is used by both `AndroidWorld/` and `task_synthesis/`.
-- `sentence-transformers` and `ImageHash` are required by `task_synthesis/`.
 
 ---
 
@@ -73,8 +65,10 @@ Reference repository: [google-deepmind/android_env](https://github.com/google-de
 This repository uses generated proto files and is sensitive to protobuf runtime version mismatches. We recommend pinning the runtime version explicitly:
 
 ```bash
-python -m pip install -U "protobuf==6.31.1"
+python -m pip install -U "protobuf==7.35.1" "grpcio==1.84.0" "grpcio-status==1.84.0"
 ```
+
+`android_env` proto files were generated with protobuf 7.35.1 and grpcio 1.84.0. The installed runtime must be at least that new. Run this after the other installs.
 
 Optional verification:
 
@@ -127,8 +121,6 @@ python -c "import pysqlite3.dbapi2 as s; c=s.connect(':memory:'); c.execute('CRE
 
 ### 7) Quick validation
 
-#### a) AndroidWorld-side validation
-
 Start `AndroidWorldAvd`:
 
 ```bash
@@ -136,21 +128,12 @@ EMULATOR_NAME=AndroidWorldAvd
 ~/Library/Android/sdk/emulator/emulator -avd $EMULATOR_NAME -no-snapshot -grpc 8554
 ```
 
-Then check that the main scripts are available:
+Then check that the eval entry point is available:
 
 ```bash
 cd /path/to/OpenMobile/AndroidWorld
-python random_walk_aw.py --help
 python run.py --help
-python run_diy.py --help
 ```
 
-#### b) Task-synthesis-side validation
-
-```bash
-cd /path/to/OpenMobile/task_synthesis
-python pipeline.py --help
-```
-
-If the imports work and the help messages print correctly, the environment is usually in a usable state.
+If the imports work and the help message prints, the environment is ready to run.
 

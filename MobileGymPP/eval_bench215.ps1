@@ -4,19 +4,19 @@
 #   conda activate android_world
 #   cd <OPENMOBILE_ROOT>\MobileGymPP
 #   .\eval_bench215.ps1 -List
-#   .\eval_bench215.ps1 -Runtime qwen35_thought_session -Port 4173 -ModelBaseUrl http://<openai-compatible-host>/v1 -ModelName YOUR_MODEL
-#   .\eval_bench215.ps1 -Runtime qwen3vl -Mode gui_only -Port 4173 -ModelBaseUrl http://<openai-compatible-host>/v1 -ModelName OpenMobile-8B
-#   .\eval_bench215.ps1 -Runtime venus -Port 4173 -ModelBaseUrl http://<openai-compatible-host>/v1 -ModelName UI-Venus-1.5-8B
-#   .\eval_bench215.ps1 -Runtime gui_owl -Port 4173 -ModelBaseUrl http://<openai-compatible-host>/v1 -ModelName GUI-Owl-1.5-8B
+#   .\eval_bench215.ps1 -Runtime qwen35_thought_session -Port 3000 -ModelBaseUrl http://<openai-compatible-host>/v1 -ModelName YOUR_MODEL
+#   .\eval_bench215.ps1 -Runtime qwen3vl -Mode gui_only -Port 3000 -ModelBaseUrl http://<openai-compatible-host>/v1 -ModelName OpenMobile-8B
+#   .\eval_bench215.ps1 -Runtime venus -Port 3000 -ModelBaseUrl http://<openai-compatible-host>/v1 -ModelName UI-Venus-1.5-8B
+#   .\eval_bench215.ps1 -Runtime gui_owl -Port 3000 -ModelBaseUrl http://<openai-compatible-host>/v1 -ModelName GUI-Owl-1.5-8B
 #
 # -Mode both runs hybrid, then gui_only. last_n is locked by runtime
 # (thought_session 3, gui_owl 5, mai_ui 3, venus 1, qwen3vl 1) unless you pass -LastN
 # for thought_session.
 
 param(
-    [string]$FrontendDir = "..\..\mobilegym++\mobilegym-mock\trial_apps\mobilegym",
+    [string]$FrontendDir = "..\..\MobileGym-plusplus",
     [string]$EnvUrl = "",
-    [int]$Port = 4173,
+    [int]$Port = 3000,
     [ValidateSet("both", "hybrid", "gui_only")]
     [string]$Mode = "both",
     [ValidateSet("all", "main", "secretary")]

@@ -49,9 +49,9 @@ if ($Parallel -gt 1) {
         "--runtime", "venus",
         "--last_n", "$LastN",
         "--max_n_steps", "$MaxNSteps",
-        "--qwen3vl_model_base_url", $ModelBaseUrl,
-        "--qwen3vl_model_name", $ModelName,
-        "--qwen3vl_model_api_key", $ApiKey
+        "--model_base_url", $ModelBaseUrl,
+        "--model_name", $ModelName,
+        "--model_api_key", $ApiKey
     )
     if ($NoHeadless) { $argsList += "--no_headless" }
 } else {
@@ -63,9 +63,9 @@ if ($Parallel -gt 1) {
         "--runtime=venus",
         "--last_n=$LastN",
         "--max_n_steps=$MaxNSteps",
-        "--qwen3vl_model_base_url=$ModelBaseUrl",
-        "--qwen3vl_model_name=$ModelName",
-        "--qwen3vl_model_api_key=$ApiKey",
+        "--model_base_url=$ModelBaseUrl",
+        "--model_name=$ModelName",
+        "--model_api_key=$ApiKey",
         "--headless=$(if ($NoHeadless) { 'false' } else { 'true' })"
     )
 }

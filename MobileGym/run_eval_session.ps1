@@ -17,7 +17,7 @@
 #   .\run_eval_session.ps1 -Split "" -FilterDifficulty L1 -Runtime qwen35_thought_session -ModelName YOUR_MODEL
 
 param(
-    [string]$FrontendDir = "..\..\mobilegym\mobilegym",
+    [string]$FrontendDir = "..\..\..\mobilegym\mobilegym",
     [string]$EnvUrl = "http://127.0.0.1:4172",
     [int]$Port = 4172,
     [int]$Parallel = 8,

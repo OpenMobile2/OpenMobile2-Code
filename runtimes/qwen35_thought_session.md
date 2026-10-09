@@ -60,8 +60,8 @@ python run_diy_mg.py \
   --runtime qwen35_thought_session \
   --last_n 3 \
   --env_url http://127.0.0.1:4172 \
-  --qwen3vl_model_base_url http://<openai-compatible-host>/v1 \
-  --qwen3vl_model_name Qwen3.5-9B \
+  --model_base_url http://<openai-compatible-host>/v1 \
+  --model_name Qwen3.5-9B \
   --input_json prepared_tasks.json \
   --output_dir runs/qwen35-thought
 ```

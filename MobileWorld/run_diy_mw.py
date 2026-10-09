@@ -16,8 +16,8 @@ Run from OpenMobile-Code/AndroidWorld so agent imports resolve:
     --output_dir runs/mobileworld_explore_rollout \
     --aw_host http://127.0.0.1:6800 \
     --agent_name qwen3vl \
-    --qwen3vl_model_base_url http://.../v1 \
-    --qwen3vl_model_name ...
+    --model_base_url http://.../v1 \
+    --model_name ...
 """
 
 from __future__ import annotations
@@ -83,20 +83,20 @@ _USE_PARAMS_INIT = flags.DEFINE_boolean(
 )
 _MAX_N_STEPS = flags.DEFINE_integer("max_n_steps", 30, "Max steps per episode.")
 _QWEN3VL_MODEL_BASE_URL = flags.DEFINE_string(
-    "qwen3vl_model_base_url", "http://<openai-compatible-host>/v1", "OpenAI-compatible base URL."
+    "model_base_url", "http://<openai-compatible-host>/v1", "OpenAI-compatible base URL."
 )
-_QWEN3VL_MODEL_API_KEY = flags.DEFINE_string("qwen3vl_model_api_key", "EMPTY", "API key.")
-_QWEN3VL_MODEL_NAME = flags.DEFINE_string("qwen3vl_model_name", "", "Model name.")
+_QWEN3VL_MODEL_API_KEY = flags.DEFINE_string("model_api_key", "EMPTY", "API key.")
+_QWEN3VL_MODEL_NAME = flags.DEFINE_string("model_name", "", "Model name.")
 _QWEN3VL_SWITCHING_WEAK_MODEL_BASE_URL = flags.DEFINE_string(
-    "qwen3vl_switching_weak_model_base_url",
+    "switching_weak_model_base_url",
     "http://127.0.0.1:32011/v1",
     "Weak model base URL for switching.",
 )
 _QWEN3VL_SWITCHING_WEAK_MODEL_API_KEY = flags.DEFINE_string(
-    "qwen3vl_switching_weak_model_api_key", "EMPTY", "Weak model API key."
+    "switching_weak_model_api_key", "EMPTY", "Weak model API key."
 )
 _QWEN3VL_SWITCHING_WEAK_MODEL_NAME = flags.DEFINE_string(
-    "qwen3vl_switching_weak_model_name",
+    "switching_weak_model_name",
     "Qwen2.5-VL-7B-Instruct-baseline",
     "Weak model name.",
 )

@@ -6,7 +6,7 @@ import warnings
 from android_env.proto.a11y import a11y_pb2 as android__env_dot_proto_dot_a11y_dot_a11y__pb2
 from android_env.proto.a11y import android_accessibility_forest_pb2 as android__env_dot_proto_dot_a11y_dot_android__accessibility__forest__pb2
 
-GRPC_GENERATED_VERSION = '1.83.0'
+GRPC_GENERATED_VERSION = '1.84.0'
 GRPC_VERSION = grpc.__version__
 _version_not_supported = False
 

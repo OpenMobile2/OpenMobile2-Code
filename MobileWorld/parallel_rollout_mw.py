@@ -9,8 +9,8 @@ Example (after `uv run mw env run --count 4` in MobileWorld repo):
     --output_dir runs/mobileworld_explore_rollout \
     --runtime qwen35_session \
     --last_n 3 \
-    --qwen3vl_model_base_url http://YOUR_VLLM/v1 \
-    --qwen3vl_model_name YOUR_MODEL
+    --model_base_url http://YOUR_VLLM/v1 \
+    --model_name YOUR_MODEL
 
 Each worker owns a disjoint sample shard and writes into the same output_dir
 (existing dirs are skipped, so restarts are safe).
@@ -54,9 +54,9 @@ def main() -> int:
         help="Shared runtime preset (overrides agent_name/memgui/memory when set).",
     )
     parser.add_argument("--max_n_steps", type=int, default=30)
-    parser.add_argument("--qwen3vl_model_base_url", type=str, default="http://<openai-compatible-host>/v1")
-    parser.add_argument("--qwen3vl_model_name", type=str, default="")
-    parser.add_argument("--qwen3vl_model_api_key", type=str, default="EMPTY")
+    parser.add_argument("--model_base_url", type=str, default="http://<openai-compatible-host>/v1")
+    parser.add_argument("--model_name", type=str, default="")
+    parser.add_argument("--model_api_key", type=str, default="EMPTY")
     parser.add_argument("--use_memgui_prompt", action="store_true")
     parser.add_argument("--use_memory_prompt", action="store_true")
     parser.add_argument(
@@ -71,9 +71,9 @@ def main() -> int:
         default=1,
         help="Recent screenshots kept for the model (default 1).",
     )
-    parser.add_argument("--qwen3vl_switching_weak_model_base_url", type=str, default="")
-    parser.add_argument("--qwen3vl_switching_weak_model_name", type=str, default="")
-    parser.add_argument("--qwen3vl_switching_weak_model_api_key", type=str, default="EMPTY")
+    parser.add_argument("--switching_weak_model_base_url", type=str, default="")
+    parser.add_argument("--switching_weak_model_name", type=str, default="")
+    parser.add_argument("--switching_weak_model_api_key", type=str, default="EMPTY")
     args = parser.parse_args()
 
     hosts = [h.strip() for h in args.hosts.split(",") if h.strip()]
@@ -92,9 +92,9 @@ def main() -> int:
             f"--params_dir={args.params_dir}",
             f"--agent_name={args.agent_name}",
             f"--max_n_steps={args.max_n_steps}",
-            f"--qwen3vl_model_base_url={args.qwen3vl_model_base_url}",
-            f"--qwen3vl_model_name={args.qwen3vl_model_name}",
-            f"--qwen3vl_model_api_key={args.qwen3vl_model_api_key}",
+            f"--model_base_url={args.model_base_url}",
+            f"--model_name={args.model_name}",
+            f"--model_api_key={args.model_api_key}",
             f"--memgui_prompt_format={args.memgui_prompt_format}",
             f"--last_n={int(args.last_n)}",
             f"--shard_index={i}",
@@ -106,17 +106,17 @@ def main() -> int:
             cmd.append("--use_memgui_prompt")
         if args.use_memory_prompt:
             cmd.append("--use_memory_prompt")
-        if args.qwen3vl_switching_weak_model_base_url:
+        if args.switching_weak_model_base_url:
             cmd.append(
-                f"--qwen3vl_switching_weak_model_base_url={args.qwen3vl_switching_weak_model_base_url}"
+                f"--switching_weak_model_base_url={args.switching_weak_model_base_url}"
             )
-        if args.qwen3vl_switching_weak_model_name:
+        if args.switching_weak_model_name:
             cmd.append(
-                f"--qwen3vl_switching_weak_model_name={args.qwen3vl_switching_weak_model_name}"
+                f"--switching_weak_model_name={args.switching_weak_model_name}"
             )
-        if args.qwen3vl_switching_weak_model_api_key:
+        if args.switching_weak_model_api_key:
             cmd.append(
-                f"--qwen3vl_switching_weak_model_api_key={args.qwen3vl_switching_weak_model_api_key}"
+                f"--switching_weak_model_api_key={args.switching_weak_model_api_key}"
             )
         print("Launch:", " ".join(cmd))
         procs.append(subprocess.Popen(cmd))

@@ -6,7 +6,7 @@ import warnings
 from android_env.proto import emulator_controller_pb2 as android__env_dot_proto_dot_emulator__controller__pb2
 from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
 
-GRPC_GENERATED_VERSION = '1.83.0'
+GRPC_GENERATED_VERSION = '1.84.0'
 GRPC_VERSION = grpc.__version__
 _version_not_supported = False
 

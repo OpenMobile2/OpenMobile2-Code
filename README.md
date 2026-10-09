@@ -1,7 +1,7 @@
 # OpenMobile-2: Building Versatile Mobile Agents with Scalable Environments and App-Native Tools
 
 <p align="center">
-&nbsp;&nbsp;📑 <a href="<PAPER_URL>">Paper</a>&nbsp;&nbsp; | &nbsp;&nbsp;🌐 <a href="https://os-copilot.github.io/OpenMobile2-Home">Homepage</a>&nbsp;&nbsp; | &nbsp;&nbsp;🤗 <a href="https://huggingface.co/datasets/OpenMobile-2/OpenMobile-Data">Dataset</a>&nbsp;&nbsp; | &nbsp;&nbsp;🤖 <a href="https://huggingface.co/OpenMobile-2/OpenMobile-27B">Model</a>&nbsp;&nbsp; | &nbsp;&nbsp;🤗 <a href="https://mobilegym-mock-production.up.railway.app">MobileGym++</a>&nbsp;&nbsp;
+&nbsp;&nbsp;📑 <a href="<PAPER_URL>">Paper</a>&nbsp;&nbsp; | &nbsp;&nbsp;🌐 <a href="https://os-copilot.github.io/OpenMobile2-Home">Homepage</a>&nbsp;&nbsp; | &nbsp;&nbsp;🤗 <a href="https://huggingface.co/datasets/OpenMobile-2/OpenMobile-Data-v2">Dataset</a>&nbsp;&nbsp; | &nbsp;&nbsp;🤖 <a href="https://huggingface.co/OpenMobile-2/OpenMobile-2-27B">Model</a>&nbsp;&nbsp; | &nbsp;&nbsp;📱 <a href="https://mobilegym-mock-production.up.railway.app">MobileGym++</a>&nbsp;&nbsp;
 </p>
 
 We introduce OpenMobile-2, a near-frontier mobile agent with fully open training environments and recipes. We make three key advances: (1) *Diverse environments with simulated commercial apps*: We build **MobileGym++**, featuring 35 realistic, functionally rich commercial-style apps with cross-app workflows, while preserving full controllability for reset and verification. Together with newly configured apps in Android emulators, this yields a diverse playground spanning over 110 apps. (2) *Open training data at scale*: Building on this foundation, we curate nearly 12K mobile interaction trajectories for supervised fine-tuning and the largest open collection of verifiable RL training data for mobile agents, comprising over 2K executable tasks with automatic rewards. (3) *Hybrid GUI and app-native tool use*: We explore an experimental mobile-use setting where apps expose selected functionalities as app-native tools alongside their GUIs, allowing agents to interleave GUI actions and tool calls within a task. We implement this setting in **MobileGym++** with over 300 carefully scoped tools across 50+ apps. Additionally, we introduce **MobileGym++ Bench** for complex, long-horizon commercial mobile scenarios, supporting both GUI-only and hybrid GUI–tool evaluation on a shared task suite.
@@ -12,6 +12,15 @@ OpenMobile-2 performs competitively across established benchmarks, including And
   <img src="assets/openmobile2.png" alt="OpenMobile-2" width="900">
 </p>
 
+Release plans:
+
+- [x] [OpenMobile-2 trajectory data](https://huggingface.co/datasets/OpenMobile-2/OpenMobile-Data-v2)
+- [x] [Fine-tuned checkpoints](https://huggingface.co/OpenMobile-2/OpenMobile-2-27B) trained on OpenMobile-2 data
+- [x] [MobileGym++ environment and benchmark](https://github.com/OpenMobile2/MobileGym-plusplus)
+- [x] Evaluation code
+- [x] [Extended Android AVDs](https://huggingface.co/datasets/yanhhh/AndroidAvd)
+- [ ] Data construction scripts
+- [ ] Other code and resources
 
 ## 📋 Contents
 
@@ -40,26 +49,33 @@ conda install -c conda-forge opencv
 python setup.py install
 python -m pip install -e android_env
 python -m pip install openai pillow tqdm ImageHash sentence-transformers
+python -m pip install -U "protobuf==7.35.1" "grpcio==1.84.0" "grpcio-status==1.84.0"
 ```
 
-On Windows the PowerShell launchers look for this environment at `%USERPROFILE%\miniconda3\envs\android_world\python.exe`. Pass `-PythonExe` if it lives somewhere else.
+The last line is required. `android_env` proto files were generated with protobuf 7.35.1 and grpcio 1.84.0, and the runtime must be at least that new. Run it after the other installs so an older pin does not win.
 
-Each benchmark's device, frontend, or emulator is installed from that project's own instructions:
+`numpy<2` is required on the opencv line. `matplotlib==3.6.1` cannot import numpy 2, and an unpinned `conda install opencv` upgrades numpy to 2.x.
 
-| Benchmark | Setup |
-|---|---|
-| AndroidWorld | [AndroidWorld](https://github.com/google-research/android_world) and [`AndroidWorld/environment.md`](AndroidWorld/environment.md) |
-| MobileGym | [mobilegym](https://github.com/Purewhiter/mobilegym) and [`MobileGym/README.md`](MobileGym/README.md) |
-| MobileWorld | [MobileWorld](https://github.com/Tongyi-MAI/MobileWorld) and [`MobileWorld/README.md`](MobileWorld/README.md) |
-| MobileGym++ | [`MobileGymPP/README.md`](MobileGymPP/README.md) |
+This repository evaluates the agent. Each device, frontend, or emulator is started from its own repository. The commands are in [Evaluation](#evaluation).
 
-Point every eval command at `http://<openai-compatible-host>/v1` and set the model name with `YOUR_MODEL`. Local servers can use `EMPTY` as the API key.
+| Benchmark | Start the environment | Score it here |
+|---|---|---|
+| AndroidWorld | [AndroidWorld](https://github.com/google-research/android_world) | [`run.py`](#androidworld) |
+| MobileGym | [mobilegym](https://github.com/Purewhiter/mobilegym) | [`run_eval_session.ps1`](#mobilegym) |
+| MobileWorld | [MobileWorld](https://github.com/Tongyi-MAI/MobileWorld) | [`parallel_eval_mw.py`](#mobileworld) |
+| MobileGym++ | [MobileGym-plusplus](https://github.com/OpenMobile2/MobileGym-plusplus) | [`eval_bench215.ps1`](#mobilegym-bench) |
 
 <a id="evaluation"></a>
 ## 📊 Evaluation
 
+Download the target model and deploy it with [vLLM](https://github.com/vllm-project/vllm) (for example, OpenMobile-2-9B). The server address and the served model name are the `model_base_url` and `model_name` used in the commands below. Local servers can use `EMPTY` as the API key.
+
+Start the environment from the repository named in the table above, then run the command in that benchmark's section.
+
 <a id="runtimes"></a>
 ### 🤗 Runtimes
+
+OpenMobile-2 is evaluated with `qwen35_thought_session`. `qwen3vl` is the flat ReAct runtime for OpenMobile-8B. `venus` and `gui_owl` reproduce UI-Venus-1.5 and GUI-Owl.
 
 | `--runtime` | What the model sees | Typical `last_n` |
 |---|---|---|
@@ -123,28 +139,34 @@ Results are written under `--checkpoint_dir`.
 <a id="mobilegym"></a>
 ### MobileGym
 
-Official MobileGym frontend (Playwright). The eval talks to the URL you start below.
+Start the phone from [mobilegym](https://github.com/Purewhiter/mobilegym). The eval below talks to the URL you start.
 
 #### 1. Start the MobileGym frontend
 
+`<MOBILEGYM_FRONTEND>` is the checkout that contains `package.json` and `bench_env`. In the official repo that is the inner `mobilegym/` directory.
+
 ```bash
-cd <PARENT>/mobilegym/mobilegym
+cd <MOBILEGYM_FRONTEND>
 npm run preview -- --host 127.0.0.1 --port 4172
 ```
 
 #### 2. Run evaluation
 
-`-EnvUrl` and `-Port` must match the preview above.
+Pass that same directory as `-FrontendDir`. `-EnvUrl` and `-Port` must match the preview above.
 
 ```powershell
 cd <OPENMOBILE_ROOT>\MobileGym
 .\run_eval_session.ps1 -Runtime qwen35_thought_session -ModelName YOUR_MODEL `
+  -FrontendDir <MOBILEGYM_FRONTEND> `
   -ModelBaseUrl http://<openai-compatible-host>/v1 -EnvUrl http://127.0.0.1:4172 -Port 4172
 .\run_eval_session.ps1 -Runtime qwen3vl -ModelName OpenMobile-8B `
+  -FrontendDir <MOBILEGYM_FRONTEND> `
   -ModelBaseUrl http://<openai-compatible-host>/v1
 .\run_eval_session.ps1 -Runtime venus -ModelName UI-Venus-1.5-8B `
+  -FrontendDir <MOBILEGYM_FRONTEND> `
   -ModelBaseUrl http://<openai-compatible-host>/v1
 .\run_eval_session.ps1 -Runtime gui_owl -ModelName GUI-Owl-1.5-8B `
+  -FrontendDir <MOBILEGYM_FRONTEND> `
   -ModelBaseUrl http://<openai-compatible-host>/v1
 ```
 
@@ -153,7 +175,7 @@ cd <OPENMOBILE_ROOT>\MobileGym
 <a id="mobileworld"></a>
 ### MobileWorld
 
-HTTP backends, one host per worker. GUI tasks and MCP tasks are separate runs. Do not put both on the same hosts at the same time.
+Start the backends from [MobileWorld](https://github.com/Tongyi-MAI/MobileWorld). [`MobileWorld/README.md`](MobileWorld/README.md) repeats that start command. GUI tasks and MCP tasks are separate runs. Do not put both on the same hosts at the same time.
 
 #### 1. Start the MobileWorld backends
 
@@ -178,9 +200,9 @@ python parallel_eval_mw.py `
   --last_n 3 `
   --tasks ALL `
   --output_dir eval-gui/YOUR_MODEL/gui-only `
-  --qwen3vl_model_base_url http://<openai-compatible-host>/v1 `
-  --qwen3vl_model_name YOUR_MODEL `
-  --qwen3vl_model_api_key EMPTY
+  --model_base_url http://<openai-compatible-host>/v1 `
+  --model_name YOUR_MODEL `
+  --model_api_key EMPTY
 ```
 
 MCP tasks use the same runtime and add `--mcp_only`. Run this only after the GUI run has released those hosts, or point it at a different pair:
@@ -193,9 +215,9 @@ python parallel_eval_mw.py `
   --mcp_only `
   --enable_user_interaction `
   --output_dir eval-mcp/YOUR_MODEL `
-  --qwen3vl_model_base_url http://<openai-compatible-host>/v1 `
-  --qwen3vl_model_name YOUR_MODEL `
-  --qwen3vl_model_api_key EMPTY
+  --model_base_url http://<openai-compatible-host>/v1 `
+  --model_name YOUR_MODEL `
+  --model_api_key EMPTY
 ```
 
 Summaries are `eval_summary.json` inside each output directory. Flat OpenMobile-8B is `--runtime qwen3vl --last_n 1` on the GUI run (MCP expects a session runtime).
@@ -203,26 +225,31 @@ Summaries are `eval_summary.json` inside each output directory. Flat OpenMobile-
 <a id="mobilegym-bench"></a>
 ### MobileGym++ Bench
 
-bench215 on the mock frontend: `gui_only` and `hybrid`. Use a different port from official MobileGym (`4172`).
+Start the phone from [MobileGym-plusplus](https://github.com/OpenMobile2/MobileGym-plusplus). Use a different port from official MobileGym (`4172`).
+
+`<MOBILEGYM_PP>` is that checkout. It contains `package.json` and `bench_env`.
 
 #### 1. Start the MobileGym++ mock frontend
 
 ```powershell
-cd <MOBILEGYM_MOCK_ROOT>\trial_apps\mobilegym
-npm run preview -- --host 127.0.0.1 --port 4173
+cd <MOBILEGYM_PP>
+npm run preview -- --host 127.0.0.1 --port 3000
 ```
 
 #### 2. Run evaluation
 
-`-Port` must match the preview above.
+Pass that same directory as `-FrontendDir`. `-Port` must match the preview above.
 
 ```powershell
 cd <OPENMOBILE_ROOT>\MobileGymPP
-.\eval_bench215.ps1 -Runtime qwen35_thought_session -Port 4173 -Mode both `
+.\eval_bench215.ps1 -Runtime qwen35_thought_session -Port 3000 -Mode both `
+  -FrontendDir <MOBILEGYM_PP> `
   -ModelBaseUrl http://<openai-compatible-host>/v1 -ModelName YOUR_MODEL
-.\eval_bench215.ps1 -Runtime qwen3vl -Mode gui_only -Port 4173 `
+.\eval_bench215.ps1 -Runtime qwen3vl -Mode gui_only -Port 3000 `
+  -FrontendDir <MOBILEGYM_PP> `
   -ModelBaseUrl http://<openai-compatible-host>/v1 -ModelName OpenMobile-8B
-.\eval_bench215.ps1 -Runtime venus -Port 4173 `
+.\eval_bench215.ps1 -Runtime venus -Port 3000 `
+  -FrontendDir <MOBILEGYM_PP> `
   -ModelBaseUrl http://<openai-compatible-host>/v1 -ModelName UI-Venus-1.5-8B
 ```
 
@@ -231,14 +258,14 @@ cd <OPENMOBILE_ROOT>\MobileGymPP
 <a id="training"></a>
 ## 🎯 Training
 
-We fine-tune OpenMobile-2 models with [ms-swift](https://github.com/modelscope/ms-swift). The SFT data is released as [OpenMobile-2/OpenMobile-Data](https://huggingface.co/datasets/OpenMobile-2/OpenMobile-Data).
+We fine-tune OpenMobile-2 models with [ms-swift](https://github.com/modelscope/ms-swift). The SFT data is released as [OpenMobile-2/OpenMobile-Data-v2](https://huggingface.co/datasets/OpenMobile-2/OpenMobile-Data-v2).
 
 The public training files are `emulator/train.json`, `simulator/gui-only/train.json`, and `simulator/hybrid/train.json`. `dataset_info.json` registers them as `emulator_qwen35_last3_noloop_notitle_nocoord_think_thought`, `mobilegym_qwen35_last3_noloop_notitle_nocoord_think_thought`, and `gui_mcp_qwen35_last3_noloop_notitle_nocoord_think_thought`.
 
 Image paths inside each JSON are relative to that file. Download the full repository so the screenshots resolve.
 
 ```bash
-hf download OpenMobile-2/OpenMobile-Data --repo-type dataset --local-dir OpenMobile-Data
+hf download OpenMobile-2/OpenMobile-Data-v2 --repo-type dataset --local-dir OpenMobile-Data-v2
 
 swift sft \
   --custom_dataset_info OpenMobile-Data/dataset_info.json \

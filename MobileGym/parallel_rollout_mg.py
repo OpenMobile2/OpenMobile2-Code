@@ -18,9 +18,9 @@ Examples:
     --output_dir runs/mobilegym_rollout \\
     --agent_name qwen3vl \\
     --use_memgui_prompt \\
-    --qwen3vl_model_base_url https://<openai-compatible-host>/v1 \\
-    --qwen3vl_model_name gemini-3.1-pro-preview \\
-    --qwen3vl_model_api_key "$OPENAI_API_KEY"
+    --model_base_url https://<openai-compatible-host>/v1 \\
+    --model_name gemini-3.1-pro-preview \\
+    --model_api_key "$OPENAI_API_KEY"
 
   # Or list URLs explicitly (legacy)
   python parallel_rollout_mg.py \\
@@ -113,9 +113,9 @@ def main() -> int:
     parser.add_argument("--step_wait_time", type=float, default=1.0)
     parser.add_argument("--headless", action="store_true", default=True)
     parser.add_argument("--no_headless", action="store_true")
-    parser.add_argument("--qwen3vl_model_base_url", type=str, default="http://<openai-compatible-host>/v1")
-    parser.add_argument("--qwen3vl_model_name", type=str, default="")
-    parser.add_argument("--qwen3vl_model_api_key", type=str, default="EMPTY")
+    parser.add_argument("--model_base_url", type=str, default="http://<openai-compatible-host>/v1")
+    parser.add_argument("--model_name", type=str, default="")
+    parser.add_argument("--model_api_key", type=str, default="EMPTY")
     parser.add_argument("--use_memgui_prompt", action="store_true")
     parser.add_argument("--use_memory_prompt", action="store_true")
     parser.add_argument(
@@ -150,9 +150,9 @@ def main() -> int:
         default="native",
         choices=["xml", "native"],
     )
-    parser.add_argument("--qwen3vl_switching_weak_model_base_url", type=str, default="")
-    parser.add_argument("--qwen3vl_switching_weak_model_name", type=str, default="")
-    parser.add_argument("--qwen3vl_switching_weak_model_api_key", type=str, default="EMPTY")
+    parser.add_argument("--switching_weak_model_base_url", type=str, default="")
+    parser.add_argument("--switching_weak_model_name", type=str, default="")
+    parser.add_argument("--switching_weak_model_api_key", type=str, default="EMPTY")
     args = parser.parse_args()
 
     urls = _resolve_worker_urls(args)
@@ -176,9 +176,9 @@ def main() -> int:
             f"--max_n_steps={args.max_n_steps}",
             f"--step_wait_time={args.step_wait_time}",
             f"--headless={'true' if headless else 'false'}",
-            f"--qwen3vl_model_base_url={args.qwen3vl_model_base_url}",
-            f"--qwen3vl_model_name={args.qwen3vl_model_name}",
-            f"--qwen3vl_model_api_key={args.qwen3vl_model_api_key}",
+            f"--model_base_url={args.model_base_url}",
+            f"--model_name={args.model_name}",
+            f"--model_api_key={args.model_api_key}",
             f"--use_memgui_prompt={'true' if args.use_memgui_prompt else 'false'}",
             f"--use_memory_prompt={'true' if args.use_memory_prompt else 'false'}",
             f"--memgui_prompt_format={args.memgui_prompt_format}",
@@ -191,17 +191,17 @@ def main() -> int:
         ]
         if args.runtime:
             cmd.append(f"--runtime={args.runtime}")
-        if args.qwen3vl_switching_weak_model_base_url:
+        if args.switching_weak_model_base_url:
             cmd.append(
-                f"--qwen3vl_switching_weak_model_base_url={args.qwen3vl_switching_weak_model_base_url}"
+                f"--switching_weak_model_base_url={args.switching_weak_model_base_url}"
             )
-        if args.qwen3vl_switching_weak_model_name:
+        if args.switching_weak_model_name:
             cmd.append(
-                f"--qwen3vl_switching_weak_model_name={args.qwen3vl_switching_weak_model_name}"
+                f"--switching_weak_model_name={args.switching_weak_model_name}"
             )
-        if args.qwen3vl_switching_weak_model_api_key:
+        if args.switching_weak_model_api_key:
             cmd.append(
-                f"--qwen3vl_switching_weak_model_api_key={args.qwen3vl_switching_weak_model_api_key}"
+                f"--switching_weak_model_api_key={args.switching_weak_model_api_key}"
             )
         print(f"[worker {i}/{len(urls)}] {url}")
         procs.append(subprocess.Popen(cmd))

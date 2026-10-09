@@ -168,34 +168,34 @@ _AGENT_NAME = flags.DEFINE_string(
     help="Agent name (legacy; ignored when --runtime is set).",
 )
 
-# Qwen3VL (OpenAI-compatible server) specific.
+# OpenAI-compatible model server for the selected runtime.
 _QWEN3VL_MODEL_BASE_URL = flags.DEFINE_string(
-    "qwen3vl_model_base_url",
+    "model_base_url",
     "http://<openai-compatible-host>/v1",
-    "Qwen3VL OpenAI-compatible base_url, e.g. http://host:port/v1",
+    "OpenAI-compatible base_url, e.g. http://host:port/v1",
 )
 _QWEN3VL_MODEL_API_KEY = flags.DEFINE_string(
-    "qwen3vl_model_api_key",
+    "model_api_key",
     "EMPTY",
-    "Qwen3VL API key for OpenAI-compatible server (if needed).",
+    "API key for the OpenAI-compatible server (if needed).",
 )
 _QWEN3VL_MODEL_NAME = flags.DEFINE_string(
-    "qwen3vl_model_name",
+    "model_name",
     "",
     "Model name passed to /v1/chat/completions (depends on your server).",
 )
 _QWEN3VL_SWITCHING_WEAK_MODEL_BASE_URL = flags.DEFINE_string(
-    "qwen3vl_switching_weak_model_base_url",
+    "switching_weak_model_base_url",
     "http://127.0.0.1:32011/v1",
     "Weak model OpenAI-compatible base_url for qwen3vl_switching.",
 )
 _QWEN3VL_SWITCHING_WEAK_MODEL_API_KEY = flags.DEFINE_string(
-    "qwen3vl_switching_weak_model_api_key",
+    "switching_weak_model_api_key",
     "EMPTY",
     "Weak model API key for qwen3vl_switching.",
 )
 _QWEN3VL_SWITCHING_WEAK_MODEL_NAME = flags.DEFINE_string(
-    "qwen3vl_switching_weak_model_name",
+    "switching_weak_model_name",
     "Qwen2.5-VL-7B-Instruct-baseline",
     "Weak model name for qwen3vl_switching.",
 )

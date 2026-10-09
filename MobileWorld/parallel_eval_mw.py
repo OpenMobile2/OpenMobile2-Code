@@ -19,9 +19,9 @@ python parallel_eval_mw.py `
   --tasks ALL `
   --n_runs 3 `
   --output_dir eval_runs/YOUR_MODEL/gui-only `
-  --qwen3vl_model_base_url http://<openai-compatible-host>/v1 `
-  --qwen3vl_model_name "YOUR_MODEL" `
-  --qwen3vl_model_api_key empty
+  --model_base_url http://<openai-compatible-host>/v1 `
+  --model_name "YOUR_MODEL" `
+  --model_api_key empty
 
 
   python parallel_eval_mw.py `
@@ -33,9 +33,9 @@ python parallel_eval_mw.py `
     --last_n 3 `
     --tasks ALL `
     --output_dir eval_runs/YOUR_MODEL/gui-only `
-    --qwen3vl_model_base_url http://<openai-compatible-host>/v1 `
-    --qwen3vl_model_name YOUR_MODEL `
-    --qwen3vl_model_api_key EMPTY
+    --model_base_url http://<openai-compatible-host>/v1 `
+    --model_name YOUR_MODEL `
+    --model_api_key EMPTY
 
   python parallel_eval_mw.py `
     --hosts http://127.0.0.1:6800,http://127.0.0.1:6801 `
@@ -44,9 +44,9 @@ python parallel_eval_mw.py `
     --last_n 3 `
     --tasks ALL `
     --output_dir eval_runs/YOUR_MODEL/gui-only `
-    --qwen3vl_model_base_url http://<openai-compatible-host>/v1 `
-    --qwen3vl_model_name "YOUR_MODEL" `
-    --qwen3vl_model_api_key EMPTY
+    --model_base_url http://<openai-compatible-host>/v1 `
+    --model_name "YOUR_MODEL" `
+    --model_api_key EMPTY
 
 MCP tasks only:
   python parallel_eval_mw.py `
@@ -59,9 +59,9 @@ MCP tasks only:
     --last_n 3 `
     --tasks ALL `
     --output_dir eval_runs/YOUR_MODEL/mcp-only `
-    --qwen3vl_model_base_url http://<openai-compatible-host>/v1 `
-    --qwen3vl_model_name YOUR_MODEL `
-    --qwen3vl_model_api_key EMPTY
+    --model_base_url http://<openai-compatible-host>/v1 `
+    --model_name YOUR_MODEL `
+    --model_api_key EMPTY
 
 Repeat 3 independent evals (sequential; same emulators):
   python parallel_eval_mw.py `
@@ -186,12 +186,12 @@ def main() -> int:
         default="auto",
         choices=["auto", "qwen3vl", "qwen35"],
     )
-    parser.add_argument("--qwen3vl_model_base_url", type=str, default="http://<openai-compatible-host>/v1")
-    parser.add_argument("--qwen3vl_model_name", type=str, default="")
-    parser.add_argument("--qwen3vl_model_api_key", type=str, default="EMPTY")
-    parser.add_argument("--qwen3vl_switching_weak_model_base_url", type=str, default="")
-    parser.add_argument("--qwen3vl_switching_weak_model_name", type=str, default="")
-    parser.add_argument("--qwen3vl_switching_weak_model_api_key", type=str, default="EMPTY")
+    parser.add_argument("--model_base_url", type=str, default="http://<openai-compatible-host>/v1")
+    parser.add_argument("--model_name", type=str, default="")
+    parser.add_argument("--model_api_key", type=str, default="EMPTY")
+    parser.add_argument("--switching_weak_model_base_url", type=str, default="")
+    parser.add_argument("--switching_weak_model_name", type=str, default="")
+    parser.add_argument("--switching_weak_model_api_key", type=str, default="EMPTY")
     parser.add_argument(
         "--keep_errors",
         action="store_true",
@@ -288,9 +288,9 @@ def run_once(args: argparse.Namespace, out: Path, hosts: list[str]) -> int:
             f"--max_n_steps={args.max_n_steps}",
             f"--last_n={int(args.last_n)}",
             f"--qwen35_tool_call_mode={args.qwen35_tool_call_mode}",
-            f"--qwen3vl_model_base_url={args.qwen3vl_model_base_url}",
-            f"--qwen3vl_model_name={args.qwen3vl_model_name}",
-            f"--qwen3vl_model_api_key={args.qwen3vl_model_api_key}",
+            f"--model_base_url={args.model_base_url}",
+            f"--model_name={args.model_name}",
+            f"--model_api_key={args.model_api_key}",
             f"--memgui_prompt_format={args.memgui_prompt_format}",
             f"--shard_index={i}",
             f"--num_shards={len(hosts)}",
@@ -312,17 +312,17 @@ def run_once(args: argparse.Namespace, out: Path, hosts: list[str]) -> int:
             cmd.append("--mcp_only")
         if args.enable_user_interaction:
             cmd.append("--enable_user_interaction")
-        if args.qwen3vl_switching_weak_model_base_url:
+        if args.switching_weak_model_base_url:
             cmd.append(
-                f"--qwen3vl_switching_weak_model_base_url={args.qwen3vl_switching_weak_model_base_url}"
+                f"--switching_weak_model_base_url={args.switching_weak_model_base_url}"
             )
-        if args.qwen3vl_switching_weak_model_name:
+        if args.switching_weak_model_name:
             cmd.append(
-                f"--qwen3vl_switching_weak_model_name={args.qwen3vl_switching_weak_model_name}"
+                f"--switching_weak_model_name={args.switching_weak_model_name}"
             )
-        if args.qwen3vl_switching_weak_model_api_key:
+        if args.switching_weak_model_api_key:
             cmd.append(
-                f"--qwen3vl_switching_weak_model_api_key={args.qwen3vl_switching_weak_model_api_key}"
+                f"--switching_weak_model_api_key={args.switching_weak_model_api_key}"
             )
         print("Launch:", " ".join(cmd))
         procs.append(subprocess.Popen(cmd))

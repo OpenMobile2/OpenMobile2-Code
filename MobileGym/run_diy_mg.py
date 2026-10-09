@@ -16,8 +16,8 @@ Example:
     --output_dir pipeline_runs/.../rollout \\
     --env_url http://127.0.0.1:3000 \\
     --runtime qwen35_session \\
-    --qwen3vl_model_base_url http://.../v1 \\
-    --qwen3vl_model_name ...
+    --model_base_url http://.../v1 \\
+    --model_name ...
 
   # Legacy (still supported):
   # --agent_name qwen3vl --use_memgui_prompt=true
@@ -77,20 +77,20 @@ _OUTPUT_DIR = flags.DEFINE_string("output_dir", None, "Output directory for traj
 _MAX_N_STEPS = flags.DEFINE_integer("max_n_steps", 30, "Max steps per episode.")
 _STEP_WAIT_TIME = flags.DEFINE_float("step_wait_time", 1.0, "Sleep after each action.")
 _QWEN3VL_MODEL_BASE_URL = flags.DEFINE_string(
-    "qwen3vl_model_base_url", "http://<openai-compatible-host>/v1", "OpenAI-compatible base URL."
+    "model_base_url", "http://<openai-compatible-host>/v1", "OpenAI-compatible base URL."
 )
-_QWEN3VL_MODEL_API_KEY = flags.DEFINE_string("qwen3vl_model_api_key", "EMPTY", "API key.")
-_QWEN3VL_MODEL_NAME = flags.DEFINE_string("qwen3vl_model_name", "", "Model name.")
+_QWEN3VL_MODEL_API_KEY = flags.DEFINE_string("model_api_key", "EMPTY", "API key.")
+_QWEN3VL_MODEL_NAME = flags.DEFINE_string("model_name", "", "Model name.")
 _QWEN3VL_SWITCHING_WEAK_MODEL_BASE_URL = flags.DEFINE_string(
-    "qwen3vl_switching_weak_model_base_url",
+    "switching_weak_model_base_url",
     "",
     "Weak model base URL for switching.",
 )
 _QWEN3VL_SWITCHING_WEAK_MODEL_API_KEY = flags.DEFINE_string(
-    "qwen3vl_switching_weak_model_api_key", "EMPTY", "Weak model API key."
+    "switching_weak_model_api_key", "EMPTY", "Weak model API key."
 )
 _QWEN3VL_SWITCHING_WEAK_MODEL_NAME = flags.DEFINE_string(
-    "qwen3vl_switching_weak_model_name",
+    "switching_weak_model_name",
     "",
     "Weak model name.",
 )
