@@ -52,10 +52,6 @@ python -m pip install openai pillow tqdm ImageHash sentence-transformers
 python -m pip install -U "protobuf==7.35.1" "grpcio==1.84.0" "grpcio-status==1.84.0"
 ```
 
-The last line is required. `android_env` proto files were generated with protobuf 7.35.1 and grpcio 1.84.0, and the runtime must be at least that new. Run it after the other installs so an older pin does not win.
-
-`numpy<2` is required on the opencv line. `matplotlib==3.6.1` cannot import numpy 2, and an unpinned `conda install opencv` upgrades numpy to 2.x.
-
 This repository evaluates the agent. Each device, frontend, or emulator is started from its own repository. The commands are in [Evaluation](#evaluation).
 
 | Benchmark | Start the environment | Score it here |
