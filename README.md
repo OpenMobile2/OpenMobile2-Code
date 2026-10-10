@@ -14,8 +14,8 @@ OpenMobile-2 performs competitively across established benchmarks, including And
 
 Release plans:
 
-- [x] [OpenMobile-2 trajectory data](https://huggingface.co/datasets/OpenMobile-2/OpenMobile-Data-v2)
-- [x] [Fine-tuned checkpoints](https://huggingface.co/OpenMobile-2/OpenMobile-2-27B) trained on OpenMobile-Data-v2
+- [x] [OpenMobile-Data-v2](https://huggingface.co/datasets/OpenMobile-2/OpenMobile-Data-v2)
+- [x] [Fine-tuned checkpoints](https://huggingface.co/OpenMobile-2/OpenMobile-2-27B) trained on [OpenMobile-Data-v2](https://huggingface.co/datasets/OpenMobile-2/OpenMobile-Data-v2)
 - [x] [MobileGym++ environment and benchmark](https://github.com/OpenMobile2/MobileGym-plusplus)
 - [x] Evaluation code
 - [x] [Extended Android AVDs](https://huggingface.co/datasets/yanhhh/AndroidAvd)
