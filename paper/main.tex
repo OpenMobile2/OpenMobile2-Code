@@ -1,0 +1,188 @@
+\documentclass{article} % For LaTeX2e
+\usepackage{iclr2027_conference,times}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{multirow}
+\usepackage{listings}
+\usepackage[most]{tcolorbox}
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{xcolor}         % colors
+\usepackage{colortbl}
+\usepackage{pifont}
+\usepackage{multirow}
+\definecolor{darkgreen}{rgb}{0, 0.5, 0} % 暗绿色
+\definecolor{darkred}{rgb}{0.8, 0, 0}  % 暗红色
+\newcommand{\greencheck}{\textcolor{darkgreen}{\ding{51}}}
+\newcommand{\redcross}{\textcolor{darkred}{\ding{55}}}
+
+\input{qiushi_custom}
+
+% Optional math commands from https://github.com/goodfeli/dlbook_notation.
+\input{math_commands.tex}
+
+% Shared macros used across chapters. Add new commands here, not in chapter files.
+\input{macros.tex}
+
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{float}
+% =============================================================================
+% Collaboration notes
+% -----------------------------------------------------------------------------
+% Compile from the project root:
+%   pdflatex main && bibtex main && pdflatex main && pdflatex main
+%
+% Each person edits only their file under chapters/. Do not put \section
+% content in this file. To reduce git conflicts:
+%   - Add citations to iclr2027_conference.bib (or your own .bib keys)
+%   - Add \newcommand / notation to macros.tex
+%   - Put figures in figures/ and reference them as figures/xxx.pdf
+%   - Prefix labels with the chapter id, e.g. \label{sec:intro}, \label{fig:method-arch}
+%
+% Owner of this file (title / authors / abstract / package list): first author
+% =============================================================================
+
+\title{OpenMobile-2: Building Versatile Mobile Agents with Scalable Environments and App-Native Tools}
+
+
+
+
+\author{%
+\textbf{Chenyang Yan}$^{12\,*}$\:
+\textbf{Yingying Zhang}$^{2\,*}$\:
+\textbf{Kanzhi Cheng}$^{12\,*\,\dagger}$\:
+\textbf{Qiushi Sun}$^{3\,*}$\:
+\textbf{Zhengyuan Pan}$^{2\,*}$\\
+\textbf{Zheng Ma}$^{2\,*\,\dagger}$
+\textbf{Hang Yan}$^{4}$
+\textbf{Yian Wang}$^{5}$
+\textbf{Nuo Chen}$^{1}$
+\textbf{Jialin Cao}$^{1}$
+\textbf{Xingdong Gong}$^{1}$
+\textbf{Wenpo Song}$^{1}$\\
+\textbf{Han Chen}$^{1}$\:
+\textbf{Zichen Ding}$^{6}$\:
+\textbf{Fangzhi Xu}$^{4}$\:
+\textbf{Shujian Huang}$^{1}$\:
+\textbf{Xinyu Dai}$^{1}$\:
+\textbf{Yichen Liu}$^{2}$\\
+\textbf{Tiankuo Yao}$^{2}$\:
+\textbf{Bo Wang}$^{2}$\:
+\textbf{Ben Kao}$^{3}$\:
+\textbf{Jianbing Zhang}$^{1\,\ddagger}$\:
+\textbf{Lewei Lu}$^{2\,\ddagger}$\:
+\textbf{Dahua Lin}$^{2}$\\[0.8em]
+$^{1}$Nanjing University\quad
+$^{2}$SenseTime\quad
+$^{3}$The University of Hong Kong\quad
+$^{4}$Xi'an Jiaotong University\\
+$^{5}$National University of Singapore\quad
+$^{6}$East China Normal University
+% $^{*}$Equal contribution\qquad
+% $^{\dagger}$Corresponding authors
+}
+
+
+\makeatletter
+\newcommand{\authornotes}[1]{\begingroup
+  \renewcommand{\thefootnote}{}%
+  \renewcommand{\@makefntext}[1]{\noindent##1}%
+  \footnotetext{#1}\endgroup}
+\makeatother
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+\newsavebox{\fighybridbox}
+
+% arXiv preprint: show authors, then put the preprint header back.
+% \iclrfinalcopy also removes the review line ruler.
+\iclrfinalcopy
+\ClearShipoutPicture
+\begin{document}
+
+\setlength{\tabcolsep}{0pt}%
+\maketitle
+\vspace{-12pt}
+\setlength{\tabcolsep}{6pt}
+\authornotes{\textsuperscript{*}Equal contribution\quad 
+\textsuperscript{\dag}Proj lead\quad
+\textsuperscript{\ddag}Corresponding author}
+\fancyhf{}
+\lhead{Preprint. Under review.}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancyfoot[C]{\thepage}
+
+\begin{abstract}
+
+We introduce OpenMobile-2, a near-frontier mobile agent with fully open training environments and recipes. We make three key advances: (1) \textit{Diverse environments with simulated commercial apps}: We build \textsc{MobileGym++}, featuring 35 realistic, functionally rich commercial-style apps with cross-app workflows, while preserving full controllability for reset and verification. Together with newly configured apps in Android emulators, this yields a diverse playground spanning over 110 apps. (2) \textit{Open training data at scale}: Building on this foundation, we curate nearly 12K mobile interaction trajectories for supervised fine-tuning and the largest open collection of verifiable RL training data for mobile agents, comprising over 2K executable tasks with automatic rewards. (3) \textit{Hybrid GUI and app-native tool use}: We explore an experimental mobile-use setting where apps expose selected functionalities as app-native tools alongside their GUIs, allowing agents to interleave GUI actions and tool calls within a task. We implement this setting in \textsc{MobileGym++} with over $300$ carefully scoped tools across $50+$  apps. Additionally, we introduce \textsc{MobileGym++ Bench} for complex, long-horizon commercial mobile scenarios, supporting both GUI-only and hybrid GUI–tool evaluation on a shared task suite. 
+OpenMobile-2 performs competitively across established benchmarks, including AndroidWorld (79.9) and MobileWorld (50.4), while showing promising transfer to real-device mobile use,
+nearly doubling SPA-Bench performance from 31.9 to 59.6.
+All resources are available at \href{https://os-copilot.github.io/OpenMobile2-Home/}{OpenMobile-2}.
+
+
+\end{abstract}
+
+
+{\setlength{\intextsep}{6pt}
+\begin{figure}[h]
+    \centering
+    \includegraphics[
+        width=\linewidth
+    ]{figures/exp-main-bars.pdf}
+    \caption{OpenMobile-2 performs strongly across established mobile agent benchmarks and achieves leading results among open-source models on real-device evaluation.}
+    \label{fig:intro-overview}
+\end{figure}}
+
+
+
+\begin{figure}[t]
+\centering
+
+\begin{minipage}[b]{0.38\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/exp-app-pies-9.pdf}
+    \\[0.3em]
+    {\small (a) Application coverage}
+\end{minipage}
+\hfill
+\begin{minipage}[b]{0.56\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/fig2_b.pdf}
+    \\[0.3em]
+    {\small (b) GUI-only vs.\ Hybrid GUI and app-native tools}
+\end{minipage}
+
+\caption{(a)~Application coverage of OpenMobile-2. Each square represents two applications; dark and light tiles denote simulator and emulator apps, and dots mark apps with native tools.
+(b)~Hybrid GUI and app-native tool use. The same task can be completed through GUI-only interaction (top) or by interleaving GUI actions with app-native tool calls (bottom) over a shared app state.}
+\label{fig:intro-hybrid}
+\end{figure}
+
+
+\input{chapters/01_introduction}
+\input{chapters/02_related_work}
+\input{chapters/03_MobileGym++}
+\input{chapters/04_OpenMobile-12k}
+\input{chapters/04_experiments}
+\input{chapters/05_analysis}
+\input{chapters/05_conclusion}
+
+% Required / recommended statements: do not count toward the page limit.
+
+
+
+\bibliography{iclr2027_conference}
+\bibliographystyle{iclr2027_conference}
+
+\appendix
+\newpage
+\input{chapters/A_appendix}
+
+\end{document}

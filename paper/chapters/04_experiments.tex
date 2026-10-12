@@ -1,0 +1,195 @@
+
+\section{Experiments}
+\label{sec:exp}
+
+In this section, we evaluate models trained with OpenMobile-Data-v2 on established mobile-agent benchmarks, real-device tasks, and \textsc{MobileGym++}. 
+
+\subsection{Training and Evaluation Details}
+\label{sec:exp-details}
+
+We train two supervised fine-tuning runs from each base model, both for 5 epochs. GUI-only SFT uses only GUI trajectories. Hybrid SFT uses the full mixture, combining those GUI trajectories with hybrid GUI--tool trajectories. RL is then initialized from the hybrid SFT checkpoint and trained on 512 tasks randomly sampled from the 2K+ executable tasks. We evaluate the resulting models on five benchmarks spanning three settings---emulator apps, physical devices, and simulated apps with both GUI-only and tool-augmented interaction. \textbf{AndroidWorld}~\citep{rawles2025androidworld} contains 116 tasks across 20 real apps on the emulator, with success determined by the resulting device state; \textbf{MobileWorld}~\citep{kong2026mobileworld} contains 201 harder long-horizon and cross-app tasks evaluated in GUI-only and MCP-enabled settings; \textbf{MobileGym}~\citep{wu2026mobilegym} uses resettable mock apps with state-based verification and reports success rate (SR) and progress rate (PR); \textbf{\textsc{MobileGym++} Bench} (Section~\ref{sec:mgpp-bench}) contains 215 single- and cross-app tasks evaluated with identical tasks and checkers in GUI-only and hybrid settings; and \textbf{SpaBench}~\citep{chen2024spa} evaluates tasks on physical Android devices, providing a real-device evaluation beyond the emulator-based training environments. Detailed training and evaluation configurations are provided in (Appendix~\ref{app:details}).
+
+We analyze the overlap between our training data and benchmark tests to
+assess potential benchmark overfitting (Appendix~\ref{app:leakage}).
+Using \texttt{text-embedding-3-large}, only 1.11\%, 0.39\%, 0.46\%, and
+2.25\% of SFT instructions exceed a cosine similarity of 0.7 with
+AndroidWorld, MobileWorld, MobileGym, and \textsc{MobileGym++} Bench,
+respectively, and none exceeds 0.9. Among the 2,475 RL task goals, 6.1\%
+exceed 0.7 with \textsc{MobileGym++} Bench, while none exceeds 0.9.
+
+
+\subsection{Main results}
+\label{sec:exp-main}
+
+\begin{table*}[h]
+\centering
+\caption{\textbf{Main results} on established mobile agent benchmarks and real-device evaluation.
+$*$ denotes results reproduced by us, and
+$\pm$ denotes the standard deviation across evaluation seeds.}
+\label{tab:main}
+\small
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lccccccccc}
+\toprule
+Method &
+\multicolumn{2}{c}{AndroidWorld} &
+\multicolumn{2}{c}{MobileWorld} &
+\multicolumn{2}{c}{MobileGym} &
+\multicolumn{2}{c}{MobileGym++} &
+SPA-Bench \\
+\cmidrule(lr){2-3}
+\cmidrule(lr){4-5}
+\cmidrule(lr){6-7}
+\cmidrule(lr){8-9}
+&
+Pass@1$\uparrow$ & Pass@3$\uparrow$
+& GUI & MCP
+& SR & PR
+& GUI & Hybrid
+& L3 \\
+\midrule
+\multicolumn{10}{c}{\textit{Commercial \& Closed-Weight Models}} \\
+\midrule
+GPT-5.6-Sol
+  & -- & --
+  & 70.1 & --
+  & -- & --
+  & -- & --
+  & 68.1* \\
+Gemini-3.1-pro-preview
+  &70.7 & --
+  & 58.1 & --
+  & -- & --
+  & -- & --
+  & 70.2* \\
+MAI-UI-32B
+  & 73.3 & --
+  & 36.2 & 30.0
+  & -- & --
+  & -- & --
+  & -- \\
+MAI-UI-235B-A22B
+  & 76.7 & --
+  & 39.7 & 37.5
+  & -- & --
+  & -- & --
+  & -- \\
+\midrule
+\multicolumn{10}{c}{\textit{Open-Weight Models}} \\
+\midrule
+UI-Venus-1.5-8B
+  & 73.7 & --
+  & -- & --
+  & 15.4 & 28.3
+  & 19.5* & 16.3*
+  & 29.8* \\
+GUI-Owl-1.5-8B
+  & 69.0 & --
+  & 38.2 & 37.5
+  & 17.2* & 31.3*
+  & 13.0* & 12.6*
+  & -- \\
+GUI-Owl-1.5-32B
+  & 69.4 & --
+  & 43.9 & 42.5
+  & 18.4* & 30.9*
+  & 18.6* & 23.3*
+  & -- \\
+MAI-UI-8B
+  & 70.7 & --
+  & 27.5 & 20.0
+  & 16.8* & 28.3*
+  & 19.1* & 18.6*
+  & -- \\
+\midrule
+\multicolumn{10}{c}{\textit{Open-Data Models}} \\
+\midrule
+OpenMobile-1-8B
+  & 64.7 $\pm$ 3.2 & 78.0
+  & 17.7 & --
+  & 13.7* & 25.5*
+  & 13.5* & 7.0*
+  & -- \\
+\multicolumn{10}{l}{OpenMobile-2-9B} \\
+Base (Qwen3.5-9B)
+  & 54.3 $\pm$ 3.7 *  & 69.8*
+  & 12.8* & 12.5*
+  & 9.4* & 20.0*
+  & 9.3* & 12.1*
+  & 25.5* \\
+\quad GUI-only SFT
+  & 72.8 $\pm$ 2.2 & 81.9
+  & 38.5 & 12.5
+  & 34.8 & 51.6
+  & 40.9 & 41.9
+  & -- \\
+\quad Hybrid SFT
+  & 73.3 $\pm$ 1.5 & 83.6
+  & 39.3 & 27.5
+  & 35.9 & 52.2
+  & 39.1 & 44.7
+  & 48.9 \\
+\quad+ RL
+  & 74.0 $\pm$ 2.9 & 83.6
+  & 38.5 & 27.5
+  & 38.3 & 52.0
+  & 40.5 & 46.5
+  & 48.9 \\
+\addlinespace
+\multicolumn{10}{l}{OpenMobile-2-27B} \\
+Base (Qwen3.6-27B)
+  & 67.1 $\pm$ 4.1 *& 81.9*
+  & 35.9* & 32.5*
+  & 37.1* & 50.1*
+  & 46.5* & 50.7*
+  & 31.9* \\
+\quad GUI-only SFT
+  & 80.8 $\pm$ 2.1 & 89.7
+  & 50.4 & 35.0
+  & 46.9 & 63.1
+  & 54.9 & 57.7
+  & -- \\
+\quad Hybrid SFT
+  & 80.8 $\pm$ 3.5 & 90.5
+  & 48.7 & 45.0
+  & 48.4 & 64.5
+  & 55.3 & 65.6
+  & 57.4 \\
+\quad + RL
+  & 79.9 $\pm$ 3.0 & 90.5
+  & 50.4 & 42.5
+  & 51.2 & 66.6
+  & 57.2 & 67.0
+  & 59.6 \\
+\bottomrule
+\end{tabular}
+}
+\end{table*}
+
+
+\paragraph{OpenMobile-Data-v2 improves performance across established mobile agent benchmarks.}
+As shown in Table~\ref{tab:main}, models fine-tuned on OpenMobile-Data-v2 consistently outperform their corresponding base models across AndroidWorld, MobileWorld, and MobileGym++. The improvements are substantial at both model scales: the 9B model gains 19.7 points on AndroidWorld over its base (54.3 to 74.0), while the 27B model gains 12.8 points (67.1 to 79.9), with consistent improvements on MobileWorld and MobileGym++ as well. These results show that the interaction experience synthesized by OpenMobile-Data-v2 is useful across different mobile environments.
+
+Starting from hybrid SFT, we further explore agentic RL on executable mobile tasks. 
+RL improves training-aligned environments, raising MobileGym success rate from 35.9 to 38.3 (9B) and from 48.4 to 51.2 (27B), while also improving 27B SPA-Bench performance from 57.4 to 59.6, suggesting improved transfer to real-device mobile use. Gains on other benchmarks remain limited, suggesting that RL benefits depend on the alignment between training environments and evaluation scenarios.
+
+
+\vspace{-2mm}
+\paragraph{Generalization beyond simulated environments to real devices.}
+Beyond established online benchmarks, we evaluate the resulting agents on real Android devices using SPA-Bench L3. Hybrid SFT achieves 48.9 and 57.4 for the 9B and 27B models, respectively, substantially improving over their corresponding base models (25.5 and 31.9) and outperforming strong open-source counterparts. These results show that the benefits of OpenMobile-Data-v2 transfer beyond the controlled environments used for training and evaluation to physical devices.
+
+\vspace{-2mm}
+\paragraph{App-native tools provide a complementary action channel.}
+MobileGym++ enables agents to interleave GUI actions with application-specific tool calls within a task. On MobileGym++ Bench, hybrid SFT improves the hybrid evaluation over GUI-only SFT at both scales (9B: 41.9 to 44.7; 27B: 57.7 to 65.6), while GUI-only success stays comparable (Table~\ref{tab:main}). This result demonstrates that app-native tools provide a useful complementary action channel for mobile agent interaction.
+
+\vspace{-2mm}
+\paragraph{Hybrid training enables generalizable tool-use behavior.}
+We compare hybrid and GUI-only SFT to evaluate whether app-native tool training transfers beyond the observed tools. On MobileWorld MCP, whose tools are unseen during training, hybrid SFT achieves 27.5 and 45.0 versus 12.5 and 35.0 for GUI-only SFT. This transfer suggests that hybrid training learns general tool-use strategies rather than memorizing specific tool APIs.
+
+
+
+
+
+
+\label{sec:exp-gui}
+

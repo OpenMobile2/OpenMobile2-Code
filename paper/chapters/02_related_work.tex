@@ -1,0 +1,22 @@
+
+\section{Related Work}
+\label{sec:related}
+
+\paragraph{Mobile Agents.} 
+Mobile agents follow natural language instructions to operate smartphones through actions such as taps, swipes, and typing.
+Early systems rely on proprietary multimodal models orchestrated by external pipelines for screen parsing, planning, and memory~\citep{wang2024mobile, zhang2025appagent, yang2026symphony, sun2026sentinel}, requiring no task specific training.
+Native agents instead pretrain vision language models for GUI grounding~\citep{cheng2024seeclick, hong2024cogagent, wu2025atlas} and fine-tune them into end-to-end action models~\citep{qin2025ui, liu2024autoglm, ye2025mobile}.
+More recent systems further improve these models through multi-turn reinforcement learning on live devices and interactive sandboxes~\citep{wang2025ui, zhou2025mai, team2026ui, xu2026mobile, gao2026ui}.
+This progression makes interaction experience a central resource for scaling mobile agents, spanning high-quality trajectories for supervised training, efficiently resettable environments, and verifiable tasks for reinforcement learning.
+
+\paragraph{Trajectory Data and Interactive Environments.}
+
+Existing training trajectories are primarily obtained in two ways. Human-recorded trajectories~\citep{rawles2023androidinthewild, li2024effects, zhang2024android, lu2025guiodyssey} are fixed once collected, expensive to annotate, and carry no executable notion of success. Interactive environments supply the missing loop and differ in how their apps are obtained. One family runs real apps on Android emulators or physical devices and grades tasks against device state~\citep{rawles2025androidworld, xu2025androidlab, chai2026a3, chen2024spa}, which is realistic but resists clean reset and is costly to parallelize; benchmarks over real commercial apps~\citep{wu2026mobilebench, feng2026mobiflow, sui2026androiddaily} inherit these constraints. The other rebuilds apps as controllable mock clients~\citep{trivedi2024appworld, wu2026mobilegym, liu2026phoneworld}, trading fidelity for cheap parallelism, clean reset, and direct state checks. Both are now used as data factories, synthesizing trajectories and verifiable tasks from the environment itself~\citep{sun2025genesis, cheng2026openmobile, liu2026scalewob, cao2026gui, team2026hymobileagent}, making application coverage a key bottleneck for scaling interaction experience.
+Yet applications in existing environments remain shallow, with no scalable way to capture interaction experience across commercial workflows.
+
+\paragraph{Hybrid GUI and Tool Use.} 
+
+GUI actions reach any visible control but are slow and brittle; structured calls are efficient but cover only the functions an interface exposes.
+Structured interfaces such as CLIs and MCP are increasingly available alongside GUIs, and recent computer-using agents have begun to combine the two~\citep{sun2026scienceboard, hu2026toolcua, yan2025mcpworld, jia2026osworld, fan2026screenshots}.
+On mobile the same split appears as API-only worlds with no phone GUI~\citep{trivedi2024appworld}, as external MCP servers attached to a GUI agent~\citep{kong2026mobileworld}, as shortcuts such as RPA over real apps~\citep{zhao2026mas}, or as actions an agent generates from its own GUI traces~\citep{lee2026improving}.
+Prior hybrid approaches typically attach external tools or system-level interfaces to a GUI agent, rather than functions exposed by the app itself. In contrast, MobileGym++ simulates commercial apps that selectively expose their own app-native tools alongside the GUI, enabling tool calls and GUI actions to interleave within a task over shared application state.

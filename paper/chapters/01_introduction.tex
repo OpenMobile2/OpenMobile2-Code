@@ -1,0 +1,41 @@
+
+\section{Introduction}
+\label{sec:intro}
+
+
+Mobile agents built on vision-language models are increasingly capable of understanding smartphone interfaces and automating everyday tasks~\citep{wang2025ui, zhou2025mai, xu2026mobile, gao2026ui, zhou2026qwen}.
+Such progress depends heavily on large-scale interaction experience, typically in the form of trajectories collected across diverse tasks, applications, and environments~\citep{cheng2026openmobile, team2026ui}. 
+Gathering such experience independently is costly, while high-quality interaction data remains largely proprietary, leaving the open community with limited training resources and open models trailing well behind.
+
+
+Scaling interaction experience without costly human annotation requires a diverse and controllable mobile playground. 
+Especially for commercial applications, reproducing rich workflows and persistent user states at scale has remained a key obstacle.
+Existing open efforts~\citep{sun2025genesis,cheng2026openmobile} largely rely on a small set of applications in Android emulators, mostly open-source apps and system utilities. Such environments provide realistic interaction, but third-party apps often lack reliable reset, while the full Android stack is costly to replicate for large-scale rollout and reinforcement learning~\citep{rawles2025androidworld}. Recent simulated environments offer an alternative path~\citep{wu2026mobilegym, liu2026phoneworld}, providing efficient reset and parallelization, yet their applications remain few and shallow, with no scalable recipe for extending them.
+
+We introduce OpenMobile-2, an open stack of environments, data, and training recipes that puts environment scaling into practice, as shown in Figure~\ref{fig:intro-hybrid}.
+We build \textsc{MobileGym++}, a large-scale mobile environment featuring diverse, high-fidelity commercial-style applications, built upon the simulation framework of MobileGym~\citep{wu2026mobilegym}.
+In particular, we add 35 functional re-implementations of commercial apps with rich internal state and cross-app workflows, while preserving full controllability for clean reset and verification of task outcomes.
+Together with newly configured apps in Android emulator, this forms a diverse training playground spanning over 110 apps. Building on this playground, we curate nearly 12K trajectories for supervised fine-tuning and more than 2K executable tasks for reinforcement learning, each equipped with a reliable verifier.
+
+
+
+We further explore an experimental mobile-use setting that combines GUI interaction with app-native tool use. This setting reflects an emerging shift in computer use, where universal but inefficient GUI interaction is increasingly complemented by efficient yet functionally bounded structured interfaces~\citep{hu2026toolcua, shi2026cua}. In \textsc{MobileGym++}, we expose selected app functionalities through over $300$ app-native tools across $50+$ apps, e.g., \textit{search\_course} in a fitness app. This enables us to train agents that interleave GUI actions and tool calls within a task.
+
+
+To push mobile agent evaluation toward real-world commercial workflows and hybrid GUI--tool interaction, we introduce \textsc{MobileGym++ Bench}, a suite of 215 long-horizon cross-app tasks with persistent user states and programmatic verification. Every task can be solved with or without tools, so GUI-only and hybrid agents are compared on the same tasks.
+OpenMobile-2 achieves competitive results on established mobile agent benchmarks, reaching 79.9 on AndroidWorld and 50.4 on MobileWorld.
+It further transfers to real-device settings, improving SPA-Bench performance from 31.9 to 59.6 and outperforming strong open-source baselines.
+Further analysis highlights the importance of scaling application diversity for improving agent generalization and reveals the complementary benefits of hybrid GUI and app-native tool use.
+
+
+Our main contributions are:
+\begin{itemize}[leftmargin=2em, itemsep=2pt, topsep=0pt, parsep=0pt]
+
+\item \textbf{Environment Scaling with Replicated Applications.}  MobileGym++ faithfully replicates 35 commercial applications with accessible state in an extendable 110-application playground, overcoming the limited scope of existing open environments.
+
+\item \textbf{Open Training Data and Recipes at Scale.}
+We release a fresh collection of nearly 12K diverse trajectories and full recipes, together with over 2K executable RL tasks with reliable verifiers, which largely advance training mobile agents.
+
+\item \textbf{A Unified Framework for GUI and App-native Tool Use.} We integrate over $300$ scoped app-native tools across $50+$ apps and introduce MobileGym++ Bench, where GUI-only and hybrid GUI-tool agents can be trained and evaluated on the same long-horizon tasks. 
+
+\end{itemize}

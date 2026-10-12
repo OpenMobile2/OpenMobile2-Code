@@ -1,0 +1,32 @@
+% Shared macros and notation. Only one person should add a new command at a time
+% to avoid git conflicts. Do not \newcommand the same name in a chapter file.
+
+% Example:
+% \newcommand{\model}{\textsc{ModelName}}
+% \newcommand{\dataset}{\textsc{DatasetName}}
+
+% Put your custom macros here
+\usepackage{fvextra}
+\usepackage[most]{tcolorbox}
+\newcommand{\promptfile}[3][]{%
+  \begin{tcolorbox}[
+    title={#2},
+    breakable,
+    enhanced,
+    colback=gray!4,
+    colframe=gray!65!black,
+    colbacktitle=gray!65!black,
+    fonttitle=\bfseries\small,
+    boxrule=0.6pt,
+    arc=2pt,
+    left=4pt, right=4pt, top=2pt, bottom=2pt,
+    #1]
+  \VerbatimInput[
+    fontsize=\scriptsize,
+    breaklines=true,
+    breakanywhere=true,
+    breakindent=0pt,
+    breaksymbolleft={\textcolor{gray}{\tiny$\hookrightarrow$}},
+  ]{#3}
+  \end{tcolorbox}%
+}
