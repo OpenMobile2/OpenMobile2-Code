@@ -707,10 +707,14 @@ def issue_generic_request(
 
 def get_adb_activity(app_name: str) -> Optional[str]:
   """Get a mapping of regex patterns to ADB activities top Android apps."""
-  for pattern, activity in _USER_PATTERN_TO_ACTIVITY.items():
+  # Standard AndroidWorld apps take precedence: some aliases in
+  # _USER_PATTERN_TO_ACTIVITY (e.g. "android", "files") prefix-match standard
+  # app names and would otherwise resolve to packages that only exist on the
+  # extended AVD.
+  for pattern, activity in _PATTERN_TO_ACTIVITY.items():
     if re.match(pattern.lower(), app_name.lower()):
       return activity
-  for pattern, activity in _PATTERN_TO_ACTIVITY.items():
+  for pattern, activity in _USER_PATTERN_TO_ACTIVITY.items():
     if re.match(pattern.lower(), app_name.lower()):
       return activity
 
