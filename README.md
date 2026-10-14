@@ -285,3 +285,18 @@ Please adjust `model`, batch size, and output paths according to your local ms-s
 ## ⚖️ License
 
 Apache 2.0. See [LICENSE](LICENSE). Third-party models, datasets, and benchmark code keep their own licenses.
+
+<a id="citation"></a>
+## 📜 Citation
+
+If you find this project useful, please consider citing:
+
+```bibtex
+@article{openmobile2,
+  title={OpenMobile-2: Building Versatile Mobile Agents with Scalable Environments and App-Native Tools},
+  author={Chenyang Yan and Yingying Zhang and Kanzhi Cheng and Qiushi Sun and Zhengyuan Pan and Zheng Ma and Hang Yan and Yian Wang and Nuo Chen and Jialin Cao and Xingdong Gong and Wenpo Song and Han Chen and Zichen Ding and Fangzhi Xu and Shujian Huang and Xinyu Dai and Yichen Liu and Tiankuo Yao and Bo Wang and Ben Kao and Jianbing Zhang and Lewei Lu and Dahua Lin},
+  journal={arXiv preprint arXiv:2610.14157},
+  year={2026},
+  url={https://arxiv.org/abs/2610.14157}
+}
+```
