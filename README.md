@@ -132,6 +132,12 @@ python run.py \
 
 Results are written under `--checkpoint_dir`.
 
+> **Scoring note.** One check differs from official AndroidWorld, in [`_SystemBrightnessToggle.is_successful`](AndroidWorld/android_world/task_evals/single/system.py).
+>
+> - **Change.** Maximum passes at `screen_brightness >= 229` instead of `== 255`. Minimum stays `== 1`.
+> - **Tasks affected.** `SystemBrightnessMax` and `SystemBrightnessMaxVerify`.
+> - **Basis.** An exact integer match is a strict standard. On a screenshot, a 2% difference on the brightness bar is hard to see. We treat a bar above 98% as maximum and a bar below 2% as minimum. Android 13 [convertGammaToLinear](https://android.googlesource.com/platform/frameworks/base/+/refs/tags/android-13.0.0_r83/packages/SettingsLib/src/com/android/settingslib/display/BrightnessUtils.java) maps 98% to `229` and 2% to `1`.
+
 <a id="mobilegym"></a>
 ### MobileGym
 
