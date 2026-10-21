@@ -136,7 +136,7 @@ Results are written under `--checkpoint_dir`.
 >
 > - **Change.** Maximum passes at `screen_brightness >= 229` instead of `== 255`. Minimum stays `== 1`.
 > - **Tasks affected.** `SystemBrightnessMax` and `SystemBrightnessMaxVerify`.
-> - **Basis.** On the screenshot, a bar above 98% looks full and a bar below 2% looks minimum. Android 13 [convertGammaToLinear](https://android.googlesource.com/platform/frameworks/base/+/refs/tags/android-13.0.0_r83/packages/SettingsLib/src/com/android/settingslib/display/BrightnessUtils.java) writes 98% as `229` and 2% as `1`. The official maximum, `255`, rejects `229`. The official minimum, `1`, already accepts 2%.
+> - **Basis.** We start from the screenshot. A bar above 98% counts as full, and a bar below 2% counts as minimum. Android 13 [convertGammaToLinear](https://android.googlesource.com/platform/frameworks/base/+/refs/tags/android-13.0.0_r83/packages/SettingsLib/src/com/android/settingslib/display/BrightnessUtils.java) writes 98% as `229` and 2% as `1`. Official AndroidWorld wants `255` for a full bar, which this position does not store. It wants `1` for a minimum bar, which 2% already stores.
 > - **Official standard.** In `_SystemBrightnessToggle.is_successful`, change `>= 229` back to `== 255`.
 
 <a id="mobilegym"></a>
