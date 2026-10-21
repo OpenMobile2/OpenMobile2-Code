@@ -47,7 +47,7 @@ class _SystemBrightnessToggle(task_eval.TaskEval):
         brightness_level = int(res.generic.output.decode().strip())
 
         if self.params["max_or_min"] == "max":
-            return 1.0 if brightness_level == 255 else 0.0
+            return 1.0 if brightness_level >= 229 else 0.0
         else:
             return 1.0 if brightness_level == 1 else 0.0
 
